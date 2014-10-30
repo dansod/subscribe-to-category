@@ -1,5 +1,4 @@
 <?php
-
 /*
   Plugin Name: Subscribe to Category
   Plugin URI: http://dcweb.nu
@@ -11,30 +10,21 @@
 */
 
 
-define( 'STC_TEXTDOMAIN', 'stc_textdomain' );
-define( 'STC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'STC_PLUGIN_PATH', dirname( __FILE__ ) );
+  define( 'STC_TEXTDOMAIN', 'stc_textdomain' );
+  define( 'STC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+  define( 'STC_PLUGIN_PATH', dirname( __FILE__ ) );
 
-function stc_load_textdomain() {
-  load_plugin_textdomain( STC_TEXTDOMAIN, false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' ); 
-}
-add_action( 'init', 'stc_load_textdomain' );
-
+  require_once( 'classes/class-main.php' );
   require_once( 'classes/class-settings.php' );
   require_once( 'classes/class-cron.php' );
   require_once( 'classes/class-subscribe.php' );
 
-  if( class_exists( 'STC_Settings' ) ) {
-    $stc_setting = new STC_Settings();
-  }
+  // Create instance for main class
+  add_action( 'plugins_loaded', array( 'STC_Main', 'get_instance' ) );
 
-  if( class_exists( 'STC_Cron' ) ) {
-    $stc_cron = new STC_Cron();
-  }
-
-  if( class_exists( 'STC_Subscribe' ) ) {
-    $stc_subscribe = new STC_Subscribe();
-  }
+  // Register activation and deactivation hook
+  //register_activation_hook( __FILE__, array( 'STC_Main', 'activate' ) );
+  register_deactivation_hook( __FILE__, array( 'STC_Main', 'deactivate' ) );
 
 
   /**

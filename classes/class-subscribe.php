@@ -23,6 +23,7 @@
   	 * @return [type] [description]
   	 */
   	private function init(){
+
       add_action( 'init', array( $this, 'register_post_type') );
       add_action( 'create_category', array( $this, 'update_subscriber_categories') );
 

@@ -76,7 +76,7 @@
         add_settings_section(
             'setting_email_id', // ID
             __( 'E-mail settings', STC_TEXTDOMAIN ), // Title
-            array( $this, 'print_section_info' ), // Callback
+            '', //array( $this, 'print_section_info' ), // Callback
             'stc-subscribe-settings' // Page
         );  
 
@@ -101,13 +101,6 @@
         if( isset( $input['email_from'] ) )
             $new_input['email_from'] = sanitize_text_field( $input['email_from'] );
 
-        if( isset( $input['hue'] ) )
-            $new_input['hue'] = sanitize_text_field( $input['hue'] );
-
-        if( isset( $input['allow_non_member_registration'] ) ) {
-          $new_input['allow_non_member_registration'] = true;
-        }
-
         return $new_input;
     }
 
@@ -122,7 +115,11 @@
      * Get the settings option array and print one of its values
      */
     public function stc_email_from_callback() {
-        printf( '<input type="text" id="email_from" name="stc_settings[email_from]" value="%s" />', isset( $this->options['email_from'] ) ? esc_attr( $this->options['email_from'] ) : '' );
+      $default_email = get_option( 'admin_email' );
+      ?>
+        <input type="text" id="email_from" class="regular-text" name="stc_settings[email_from]" value="<?php echo isset( $this->options['email_from'] ) ? esc_attr( $this->options['email_from'] ) : '' ?>" />
+        <p class="description"><?php printf( __( 'Enter the e-mail address for the sender, if empty the admin e-mail address %s is going to be used as sender.', STC_TEXTDOMAIN ), $default_email ); ?></p>
+        <?php
     }
 
   }

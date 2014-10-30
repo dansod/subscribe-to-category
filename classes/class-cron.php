@@ -17,6 +17,7 @@
     public function init(){
       add_action( 'wp', array( $this, 'cron_schedule') );
       add_action( 'stc_hourly_event', array( $this, 'stc_do_this_hourly' ) );
+      //add_action( 'init', array( $this, 'test' ) );
       //add_action( 'init', array( $this, 'kill_cron' ) );
       
       // save settings to array
