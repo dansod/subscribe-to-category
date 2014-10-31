@@ -35,17 +35,7 @@ class STC_Main {
 	 */
 	public function create_instance(){
 
-		if( class_exists( 'STC_Settings' ) ) {
-    	$stc_setting = new STC_Settings();
-  	}
 
-	  if( class_exists( 'STC_Cron' ) ) {
-	    $stc_cron = new STC_Cron();
-	  }
-
-	  if( class_exists( 'STC_Subscribe' ) ) {
-	    $stc_subscribe = new STC_Subscribe();
-	  }
 	}
 
 	/**
@@ -133,10 +123,30 @@ class STC_Main {
 	}
 
 	/**
-	 * Remove settings if plugin is deactivated
+	 * Add some settings when plugin is activated
+	 * - Cron schedule
+	 */
+	private static function single_activate() {
+		
+		//check if event is already scheduled
+	  $timestamp = wp_next_scheduled( 'stc_schedule_email' );
+	  if( $timestamp == false ){
+	    wp_schedule_event( time(), 'hourly', 'stc_schedule_email' );
+	  }		
+	}
+
+	/**
+	 * Remove some settings on deactivation
+	 * - delete options
+	 * - delete hook
 	 */
 	private static function single_deactivate() {
+
 		delete_option( 'stc_settings' );
+
+		// kill hook for scheduled event
+		wp_clear_scheduled_hook( 'stc_schedule_email' );
+		
 	}
 
 	/**

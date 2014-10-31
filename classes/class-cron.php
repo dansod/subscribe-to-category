@@ -2,10 +2,10 @@
   /**
    * 
    * Class for cron job
-   * @author Daniel Söderström <daniel.soderstrom@cybercom.com>
+   * @author Daniel Söderström <info@dcweb.nu>
    * 
    */
-  
+
 
   class STC_Cron {
     private $settings = array();
@@ -15,43 +15,14 @@
   	}
 
     public function init(){
-      add_action( 'wp', array( $this, 'cron_schedule') );
-      add_action( 'stc_hourly_event', array( $this, 'stc_do_this_hourly' ) );
-      //add_action( 'init', array( $this, 'test' ) );
-      //add_action( 'init', array( $this, 'kill_cron' ) );
-      
-      // save settings to array
+      add_action( 'stc_schedule_email', array( $this, 'stc_send_email' ) );
       $this->settings = get_option( 'stc_settings' );
-    }
-
-    /**
-     * Kill cron, dev method
-     * @return [type] [description]
-     */
-    function kill_cron(){
-      //wp_clear_scheduled_hook( 'stc_hourly_event' );
-    }
-
-
-    function test(){
-      //echo "xxx";
-      $cron = get_option('cron');
-      util::debug( $cron );
-    }
-
-    /**
-     * On an early action hook, check if the hook is scheduled - if not, schedule it.
-     */
-    public function cron_schedule() {
-      if ( !wp_next_scheduled( 'stc_hourly_event' ) ) {
-        wp_schedule_event( time(), 'hourly', 'stc_hourly_event' );
-      }
     }
 
     /**
      * On the scheduled action hook, run a function.
      */
-    public function stc_do_this_hourly() {
+    public function stc_send_email() {
       global $wpdb;
 
       // get posts with a post meta value in outbox
@@ -126,10 +97,11 @@
       $headers  = 'MIME-Version: 1.0' . "\r\n";
       $headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
       $headers .= 'From: '. $website_name.' <'.$email_from.'>' . "\r\n";
-
       
       // loop through subscribers and send notice
       foreach ($emails as $email ) {
+
+        //wp_mail( $email['email'], 'Automatic email ' . $email['email'], 'Automatic scheduled email from WordPress.');
 
         ob_start(); // start buffering and get content
         $this->email_html_content( $email );
@@ -157,7 +129,7 @@
     private function email_html_content( $email ){
       ?>
       <h3><a href="<?php get_permalink( $email['post_id']) ?>"><?php echo $email['post']->post_title; ?></a></h3>
-      <div><?php echo apply_filters('the_content', string_cut( $email['post']->post_content, 130 ) );?></div>
+      <div><?php echo apply_filters('the_content', $this->string_cut( $email['post']->post_content, 130 ) );?></div>
       <div style="border-bottom: 1px solid #cccccc; padding-bottom: 10px;"><a href="<?php echo get_permalink( $email['post_id'] ); ?>"> <?php _e('Click here to read full story', STC_TEXTDOMAIN ); ?></a></div>
       <div style="margin-top: 20px;"><a href="<?php echo wp_nonce_url( get_permalink() . '?stc_user=' . $email['hash'], 'unsubscribe_user', 'stc_nonce' ); ?>"><?php _e('Unsubscribe me', STC_TEXTDOMAIN ); ?></a></div>
       <?php
