@@ -22,7 +22,7 @@ if( class_exists( 'STC_Settings' ) ) {
       // only in admin mode
       if( is_admin() ) {    
         add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
-        add_action( 'admin_init', array( $this, 'page_init' ) );
+        add_action( 'admin_init', array( $this, 'register_settings' ) );
       }
 
     }
@@ -58,6 +58,7 @@ if( class_exists( 'STC_Settings' ) ) {
             // print out all hidden setting fields
             settings_fields( 'stc_option_group' );   
             do_settings_sections( 'stc-subscribe-settings' );
+            do_settings_sections( 'stc-style-settings' );
             submit_button(); 
         ?>
         </form>
@@ -68,15 +69,31 @@ if( class_exists( 'STC_Settings' ) ) {
     /**
      * Register and add settings
      */
-    public function page_init(){        
+    public function register_settings(){        
 
-        // Google Maps
+        // Email settings
         add_settings_section(
             'setting_email_id', // ID
             __( 'E-mail settings', STC_TEXTDOMAIN ), // Title
             '', //array( $this, 'print_section_info' ), // Callback
             'stc-subscribe-settings' // Page
         );  
+
+        // Styleing settings
+        add_settings_section(
+            'setting_style_id', // ID
+            __( 'Stylesheet (CSS) settings', STC_TEXTDOMAIN ), // Title
+            '', //array( $this, 'print_section_info' ), // Callback
+            'stc-style-settings' // Page
+        );  
+
+        add_settings_field(
+            'stc_custom_css',
+            __( 'Custom CSS: ', STC_TEXTDOMAIN ),
+            array( $this, 'stc_css_callback' ), // Callback
+            'stc-style-settings', // Page
+            'setting_style_id' // Section           
+        );
 
 
         add_settings_field(
@@ -126,56 +143,14 @@ if( class_exists( 'STC_Settings' ) ) {
 
         if( isset( $input['title'] ) ){
           $output['title'] = $input['title'];
-          //echo "title";
+        }
+
+        if( isset( $input['exclude_css'] ) ){
+          $output['exclude_css'] = $input['exclude_css'];
         }
 
         return $output;
-
-/*
-        foreach( $input as $key => $value  ){
-
-          switch ( $key ) {
-            case 'email_from':
-              # code...
-              break;
-
-            case 'title':
-              # code...
-              break;
-    
-          }
-
-
-        }
-
-  */    
-/*
-        $new_input = array();
-
-        if( isset( $input['email_from'] ) )
-            $new_input['email_from'] = sanitize_text_field( $input['email_from'] );
-
-        return $new_input;
-        */
     }
-
-
- public function sunny_demo_validate_input_cloudflare_email ( $input ) {
-      // Get old value from DB
-      $sunny_cloudflare_email = get_option( 'sunny_demo_cloudflare_email' );
-
-      // Don't trust users
-      $input = sanitize_email( $input );
-
-      if ( is_email( $input ) || !empty( $input ) ) {
-          $output = $input;
-      }
-      else
-        add_settings_error( 'sunny_demo_cloudflare_account_section', 'invalid-email', __( 'You have entered an invalid email.', $this->plugin_slug ) );
-
-    return $output;
-
-      } //end sunny_demo_validate_input_cloudflare_email
 
 
 
@@ -201,12 +176,24 @@ if( class_exists( 'STC_Settings' ) ) {
      * Get the settings option array and print one of its values
      */
     public function stc_title_callback() {
-      $default_email = get_option( 'admin_email' );
       ?>
         <input type="text" id="email_from" class="regular-text" name="stc_settings[title]" value="<?php echo isset( $this->options['title'] ) ? esc_attr( $this->options['title'] ) : '' ?>" />
         <p class="description"><?php printf( __( 'Enter the e-mail address for the sender, if empty the admin e-mail address %s is going to be used as sender.', STC_TEXTDOMAIN ), $default_email ); ?></p>
         <?php
     }
+
+    /** 
+     * Get the settings option array and print one of its values
+     */
+    public function stc_css_callback() { ?>
+
+      <label for="exclude_css"><input type="checkbox" value="1" id="exclude_css" name="stc_settings[exclude_css]" <?php checked( '1', $this->options['exclude_css'] ); ?>><?php _e('Exclude custom CSS', STC_TEXTDOMAIN ); ?></label>
+      <p class="description"><?php _e('Check this option if your theme supports Bootstrap framework or if you want to place your own CSS for Subscribe to Category in your theme.', STC_TEXTDOMAIN ); ?></p>
+
+
+    <?php
+    }
+
 
   }
 

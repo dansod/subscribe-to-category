@@ -8,12 +8,16 @@ class STC_Main {
 
 	protected $plugin_slug = 'stc';
 	protected static $instance = null;
+	private $options = array();
 
 	/**
 	 * Initialize the plugin by setting localization and loading public scripts
 	 * and styles.
 	 */
 	private function __construct() {
+
+		// store options in to an array
+		$this->set_options();
 
 		// Load plugin text domain
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
@@ -22,11 +26,18 @@ class STC_Main {
 		//add_action( 'wpmu_new_blog', array( $this, 'activate_new_site' ) );
 
 		// load public css
-		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 	
 		// load public scripts
 		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
+	}
+
+	/**
+	 * Store options to an array
+	 */
+	private function set_options(){
+		$this->options = get_option( 'stc_settings');
 	}
 
 	/**
@@ -186,7 +197,10 @@ class STC_Main {
 	 * Register and enqueue public style sheet.
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css', __FILE__ ), array(), self::VERSION );
+		$options = $this->options;
+		
+		if( $options['exclude_css'] == false ) // check options for css
+			wp_enqueue_style( 'stc-style', STC_PLUGIN_URL . '/css/stc-style.css', array() );
 	}
 
 	/**
