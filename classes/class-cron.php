@@ -171,8 +171,9 @@
     private function get_subscribers(){
 
       $args = array(
-        'post_type' => 'stc',
+        'post_type'   => 'stc',
         'numberposts' => -1,
+        'post_status' => 'publish'
       );
 
      $stc = get_posts( $args );

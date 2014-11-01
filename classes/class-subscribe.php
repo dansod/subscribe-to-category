@@ -35,6 +35,10 @@ if( class_exists( 'STC_Subscribe' ) ) {
       add_action( 'wp', array( $this, 'collect_get_data' ) );
   		add_action( 'wp', array( $this, 'collect_post_data') );
 
+      add_action( 'save_post_stc', array( $this, 'save_post_stc') );
+      add_action( 'admin_notices', array( $this, 'save_post_stc_error' ) );
+
+
   		add_shortcode( 'stc-subscribe', array( $this, 'stc_subscribe_render' ) );
       add_action( 'transition_post_status', array( $this, 'new_post_submit' ), 10, 3 );
 
@@ -100,8 +104,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
      */
     public function collect_get_data(){
 
-      //if (isset($_GET['stc_nonce']) && wp_verify_nonce( $_GET['stc_nonce'], 'unsubscribe_user' )) {
-      if (isset($_GET['stc_nonce'])) {
+      if (isset($_GET['stc_nonce']) && wp_verify_nonce( $_GET['stc_nonce'], 'unsubscribe_user' )) {
         if(isset( $_GET['stc_user'] )){
           $this->unsubscribe_user();
           add_action( 'template_redirect', array( $this, 'unsubscribe_html' ) );
@@ -220,7 +223,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
         return false;
       ?>
         <h3><?php printf( __('Unsubscribe from %s', STC_TEXTDOMAIN ), get_bloginfo( 'name' ) ); ?></h3>
-        <div style="margin-top: 20px;"><a href="<?php echo wp_nonce_url( get_permalink() . '?stc_user=' . $stc['hash'], 'unsubscribe_user', 'stc_nonce' ); ?>"><?php _e('Follow this link to confirm your unsubscription', STC_TEXTDOMAIN ); ?></a></div>
+        <div style="margin-top: 20px;"><a href="<?php echo wp_nonce_url( get_bloginfo('url') . '?stc_user=' . $stc['hash'], 'unsubscribe_user', 'stc_nonce' ); ?>"><?php _e('Follow this link to confirm your unsubscription', STC_TEXTDOMAIN ); ?></a></div>
       <?php
 
     }
@@ -369,6 +372,97 @@ if( class_exists( 'STC_Subscribe' ) ) {
       return $post_id;
   	
   	}
+
+
+    /**
+     * Save post for stc post_type from admin
+     */
+    public function save_post_stc( $post_id ) {
+      global $post;
+
+      
+      // bail for bulk actions and auto-drafts
+      if(empty( $_POST )) 
+        return false;
+
+      // Bail if we're doing an auto save  
+      if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) 
+        return false; 
+
+      // if our current user can't edit this post, bail  
+      if( !current_user_can( 'edit_post' ) ) 
+        return false;  
+
+      // get categories to for counting and comparing to user categories
+      $categories = get_categories( array('hide_empty' => false ));
+      $sum_of_categories = count( $categories );
+      $sum_of_post_categories = count( $_POST['post_category'] ) - 1; // wp sets a dummy item in post_category, therefore -1
+
+
+      // sanitize input
+      $email = sanitize_email( $_POST['post_title'] );
+
+      // is email valid 
+      if(! is_email( $email ) ){
+        set_transient( 'error', __( 'You need to enter a valid email address', STC_TEXTDOMAIN ) ); // set error if not valid
+      } else {
+        $this->data['email'] = $email;
+        $post_id_match = $this->subscriber_exists();  
+      }
+        
+      if( $post_id_match != $post_id || empty( $post_id_match )){
+        set_transient('error', __('E-mail address already exists', STC_TEXTDOMAIN ) ); // set error
+      }
+
+      if( $sum_of_post_categories < 1 ){
+       set_transient('error', __('No categories are selected', STC_TEXTDOMAIN ) );  // set error
+      }
+
+      $error = get_transient( 'error' );
+
+      // if there are errors set post to draft
+      if(!empty( $error )){
+
+        remove_action('save_post_stc', array( $this, 'save_post_stc' ) );
+        // update the post set it to draft
+        wp_update_post( array('ID' => $post_id, 'post_status' => 'draft' ) );
+        
+        add_action( 'save_post_stc', array( $this, 'save_post_stc' ) );
+
+        return false;
+      }
+
+
+      // no errors, continue 
+      // is there a hash for user
+      $hash_exists = get_post_meta( $post_id, '_stc_hash', true );
+      if( empty( $hash_exists ))
+        update_post_meta( $post_id, '_stc_hash', md5( $data['email'].time() ) );
+
+
+      // check if user has all categories and update post meta if true
+      if( $sum_of_categories == $sum_of_post_categories )
+        update_post_meta( $post_id, '_stc_all_categories', 1 );
+      else
+        delete_post_meta( $post_id, '_stc_all_categories' );
+
+    }
+
+    /**
+     * Display error in wordpress format as notice if exists
+     */
+    public function save_post_stc_error(){
+
+      if ( get_transient( 'error' ) ) {
+        $error = get_transient('error' );
+
+        $error .= __( ' - this post is set to draft', STC_TEXTDOMAIN );
+        printf( '<div id="message" class="error"><p><strong>%s</strong></p></div>', $error );
+        delete_transient( 'error' );
+      } 
+
+    }
+
 
   	/**
   	 * Render html to subscribe to categories
