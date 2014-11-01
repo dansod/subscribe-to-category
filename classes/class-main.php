@@ -17,15 +17,14 @@ class STC_Main {
 
 		// Load plugin text domain
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
-
-		// create instances for classes
-		add_action( 'init', array( $this, 'create_instance' ) );
-
+		
 		// Activate plugin when new blog is added
 		//add_action( 'wpmu_new_blog', array( $this, 'activate_new_site' ) );
 
-		// Load public-facing style sheet and JavaScript.
+		// load public css
 		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+	
+		// load public scripts
 		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
 	}
@@ -35,6 +34,17 @@ class STC_Main {
 	 */
 	public function create_instance(){
 
+    if( class_exists( 'STC_Settings' ) ) {
+      $stc_setting = new STC_Settings();
+    }
+
+    if( class_exists( 'STC_Cron' ) ) {
+      $stc_cron = new STC_Cron();
+    }
+
+    if( class_exists( 'STC_Subscribe' ) ) {
+      $stc_subscribe = new STC_Subscribe();
+    }
 
 	}
 
@@ -146,7 +156,7 @@ class STC_Main {
 
 		// kill hook for scheduled event
 		wp_clear_scheduled_hook( 'stc_schedule_email' );
-		
+
 	}
 
 	/**
@@ -173,21 +183,17 @@ class STC_Main {
 	}
 
 	/**
-	 * Register and enqueue public-facing style sheet.
-	 *
-	 * @since    1.0.0
+	 * Register and enqueue public style sheet.
 	 */
 	public function enqueue_styles() {
 		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css', __FILE__ ), array(), self::VERSION );
 	}
 
 	/**
-	 * Register and enqueues public-facing JavaScript files.
-	 *
-	 * @since    1.0.0
+	 * Register and enqueues public JavaScript files.
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js', __FILE__ ), array( 'jquery' ), self::VERSION );
+		wp_enqueue_script( 'stc-script', STC_PLUGIN_URL . '/js/stc-scripts.js', array( 'jquery' ) );
 	}
 
 }

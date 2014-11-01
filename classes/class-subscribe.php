@@ -2,9 +2,14 @@
   /**
    * 
    * Class for subscribe
-   * @author Daniel Söderström <daniel.soderstrom@cybercom.com>
+   * @author Daniel Söderström <info@dcweb.nu>
    * 
    */
+  
+if( class_exists( 'STC_Subscribe' ) ) {
+  $stc_subscribe = new STC_Subscribe();
+}
+
 
   class STC_Subscribe {
 
@@ -71,14 +76,36 @@
     }
 
     /**
+     * Method for printing unsubscription text on custom page
+     */
+    public function unsubscribe_html(){
+      global $post;
+      get_header();
+    ?>
+    <div id="stc-unsubscribe-wrappesr" class="">
+      <div class="alert alert-success text-center">
+        <p><?php echo $this->notice[0]; ?></p>
+        <p><a href="<?php echo get_bloginfo('url'); ?>"><?php _e( 'Take me to start page', STC_TEXTDOMAIN ); ?></a></p>
+      </div>
+    </div>
+      <?php
+      get_sidebar();
+      get_footer();
+      exit;
+    }
+
+    /**
      * Collecting data through _GET
      * 
      */
     public function collect_get_data(){
 
-      if (isset($_GET['stc_nonce']) && wp_verify_nonce( $_GET['stc_nonce'], 'unsubscribe_user' )) {
-        if(isset( $_GET['stc_user'] ))
+      //if (isset($_GET['stc_nonce']) && wp_verify_nonce( $_GET['stc_nonce'], 'unsubscribe_user' )) {
+      if (isset($_GET['stc_nonce'])) {
+        if(isset( $_GET['stc_user'] )){
           $this->unsubscribe_user();
+          add_action( 'template_redirect', array( $this, 'unsubscribe_html' ) );
+        }
       }   
 
       if (isset( $_GET['stc_status'] ) && $_GET['stc_status'] == 'success' ) {
@@ -91,6 +118,7 @@
     /**
      * Unsubscribe user from subscription
      * 
+     * @TODO: add contact email if something went wrong
      */
     private function unsubscribe_user(){
       global $wpdb;
@@ -105,10 +133,11 @@
         ", $meta_key, $meta_value, $this->post_type )
       );
 
-
-
-      if(empty( $user_id ))
-        return false;
+      if(empty( $user_id )){
+        $notice[] = __('We are sorry but something went wrong with your unsubscription.');
+        return $this->notice = $notice;
+      }
+    
 
         $subscriber_email = get_the_title( $user_id );
         wp_delete_post( $user_id );
@@ -348,6 +377,7 @@
      * @todo add some filter 
   	 */
   	public function stc_subscribe_render(){
+
       //start buffering
   		ob_start();
   		$this->html_render();

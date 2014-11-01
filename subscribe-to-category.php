@@ -18,18 +18,6 @@
   require_once( 'classes/class-cron.php' );
   require_once( 'classes/class-subscribe.php' );
 
-    if( class_exists( 'STC_Settings' ) ) {
-      $stc_setting = new STC_Settings();
-    }
-
-    if( class_exists( 'STC_Cron' ) ) {
-      $stc_cron = new STC_Cron();
-    }
-
-    if( class_exists( 'STC_Subscribe' ) ) {
-      $stc_subscribe = new STC_Subscribe();
-    }
-
   // Create instance for main class
   add_action( 'plugins_loaded', array( 'STC_Main', 'get_instance' ) );
 
