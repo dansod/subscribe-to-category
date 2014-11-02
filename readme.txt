@@ -20,6 +20,7 @@ This plugin lets a user subscribe to posts within a certain category or categori
 - Settings for custom CSS
 - Custom post type for subscribers
 - Possibility to translate to your own language, included languages (swedish, english)
+- Export subscribers to Excel
 
 == Installation ==
 
