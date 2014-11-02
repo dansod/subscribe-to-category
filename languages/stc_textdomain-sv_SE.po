@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Subscribe to Category v1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2014-11-02 08:53:11+0000\n"
+"PO-Revision-Date: 2014-11-02 12:10:00+0000\n"
 "Last-Translator: adminccsuser <daniel.soderstrom@cybercom.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -96,32 +96,32 @@ msgstr "Prenumerera"
 msgid "Unsubscribe"
 msgstr "Avanmäl"
 
-#: classes/class-settings.php:42
+#: classes/class-settings.php:47
 #@ stc_textdomain
 msgid "Subscribe to Category"
 msgstr "Prenumerera på en kategori"
 
-#: classes/class-settings.php:43
+#: classes/class-settings.php:48
 #@ stc_textdomain
 msgid "Subscribe"
 msgstr "Prenumerera"
 
-#: classes/class-settings.php:61
+#: classes/class-settings.php:66
 #@ stc_textdomain
 msgid "Settings for subscribe to category"
 msgstr "Inställningar för Subscribe to Category"
 
-#: classes/class-settings.php:84
+#: classes/class-settings.php:89
 #@ stc_textdomain
 msgid "E-mail settings"
 msgstr "E-postinställningar"
 
-#: classes/class-settings.php:108
+#: classes/class-settings.php:113
 #@ stc_textdomain
 msgid "E-mail from: "
 msgstr "E-postadress från:"
 
-#: classes/class-settings.php:168
+#: classes/class-settings.php:173
 #@ stc_textdomain
 msgid "Add your E-mail settings"
 msgstr "Lägg till e-postinställningar"
@@ -176,57 +176,42 @@ msgstr "Papperskorgen är tom"
 msgid "Subscribers"
 msgstr "Prenumeranter"
 
-#: classes/class-settings.php:92
+#: classes/class-settings.php:97
 #@ stc_textdomain
 msgid "Stylesheet (CSS) settings"
 msgstr "Inställning för CSS"
 
-#: classes/class-settings.php:99
+#: classes/class-settings.php:104
 #@ stc_textdomain
 msgid "Custom CSS: "
 msgstr "STC stylesheet:"
 
-#: classes/class-settings.php:116
+#: classes/class-settings.php:121
 #@ stc_textdomain
 msgid "Title: "
 msgstr "Titel:"
 
-#: classes/class-settings.php:146
+#: classes/class-settings.php:151
 #@ stc_textdomain
 msgid "You have entered an invalid email."
 msgstr "Du har engett en felaktig e-postadress."
 
-#: classes/class-settings.php:178
-#: classes/class-settings.php:188
+#: classes/class-settings.php:183
+#: classes/class-settings.php:193
 #, php-format
 #@ stc_textdomain
 msgid "Enter the e-mail address for the sender, if empty the admin e-mail address %s is going to be used as sender."
 msgstr "Ange den e-postadress som ska användas som avsändare, som standard används administratörens e-post %s."
 
-#: classes/class-settings.php:197
+#: classes/class-settings.php:202
 #@ stc_textdomain
 msgid "Exclude custom CSS"
 msgstr "Exkludera STC CSS"
 
-#: classes/class-settings.php:198
+#: classes/class-settings.php:203
 #@ stc_textdomain
 msgid "Check this option if your theme supports Bootstrap framework or if you want to place your own CSS for Subscribe to Category in your theme."
 msgstr "Använd detta alternativ om ditt tema använder Bootstrap ramverket eller om du vill använda egen css för Subscribe to Category i ditt tema."
-
-#: classes/class-settings.php:208
-#@ stc_textdomain
-msgid "Export"
-msgstr "Exportera"
-
-#: classes/class-settings.php:213
-#@ stc_textdomain
-msgid "Export options"
-msgstr "Exportalternativ"
-
-#: classes/class-settings.php:215
-#@ stc_textdomain
-msgid "Export to Excel"
-msgstr "Exportera till Excel"
 
 #: classes/class-subscribe.php:92
 #@ stc_textdomain
@@ -252,4 +237,24 @@ msgstr "Inga kategorier valda"
 #@ stc_textdomain
 msgid " - this post is set to draft"
 msgstr "- inläggets status är ändrat till utkast."
+
+#: classes/class-settings.php:214
+#@ stc_textdomain
+msgid "Export to excel"
+msgstr "Exportera till excel"
+
+#: classes/class-settings.php:219
+#@ stc_textdomain
+msgid "Filter by categories"
+msgstr "Välj och filtrera på kategorier"
+
+#: classes/class-settings.php:226
+#@ stc_textdomain
+msgid "There are no categories to list yet"
+msgstr "Det finns ännu inga kategorier inlagda"
+
+#: classes/class-settings.php:296
+#@ stc_textdomain
+msgid "Filtered by: "
+msgstr "Filtrering på:"
 

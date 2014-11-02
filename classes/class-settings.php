@@ -13,6 +13,7 @@ if( class_exists( 'STC_Settings' ) ) {
   class STC_Settings {
     
     private $options; // holds the values to be used in the fields callbacks
+    private $export_in_categories = array(); // holds value for filter export categories
 
     /**
      * Constructor
@@ -33,7 +34,11 @@ if( class_exists( 'STC_Settings' ) ) {
     public function add_plugin_page() {
       
       if( isset( $_POST['action'] ) && $_POST['action'] == 'export' ){
-        if( $_POST['export_to_excel'] == 1 )
+          
+          // listen for filter by categories
+          if( isset( $_POST['in_categories'] ) && !empty( $_POST['in_categories'] ) ){
+            $this->export_in_categories = $_POST['in_categories']; 
+          }
           $this->export_to_excel();
       }
       
@@ -204,15 +209,22 @@ if( class_exists( 'STC_Settings' ) ) {
 
 
     public function export_to_excel_form(){
+      $categories = get_categories( array( 'hide_empty' => false ) ); 
       ?>
-      <h3><?php _e( 'Export', STC_TEXTDOMAIN ); ?></h3>
+      <h3><?php _e( 'Export to excel', STC_TEXTDOMAIN ); ?></h3>
       <form method="post" action="options-general.php?page=stc-subscribe-settings">
       <table class="form-table">
         <tbody>
           <tr>
-            <th scope="row"><?php _e('Export options', STC_TEXTDOMAIN ); ?></th>
+            <th scope="row"><?php _e('Filter by categories', STC_TEXTDOMAIN ); ?></th>
             <td>
-              <label for="export-to-excel"><input type="checkbox" name="export_to_excel" id="export-to-excel" value="1"><?php _e( 'Export to Excel', STC_TEXTDOMAIN ); ?></label>
+              <?php if(! empty( $categories )) : ?>
+                <?php foreach( $categories as $cat ) : ?>
+                  <label for="<?php echo $cat->slug; ?>"><input type="checkbox" name="in_categories[]" id="<?php echo $cat->slug; ?>" value="<?php echo $cat->term_id; ?>"><?php echo $cat->name; ?></label>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <?php _e('There are no categories to list yet', STC_TEXTDOMAIN ); ?>
+              <?php endif; ?>
             </td>
           </tr>
         </tbody>
@@ -229,14 +241,26 @@ if( class_exists( 'STC_Settings' ) ) {
    * Export method for excel
    */
   public function export_to_excel(){
-    //global $wpdb;
-    //
+
     $args = array(
       'post_type'     => 'stc',
       'post_status'   => 'publish',
+      'category__in'  => $this->export_in_categories // Empty value returns all categories
     );
 
     $posts = get_posts( $args );
+
+    // get category names for filtered categories to print out in excel file, if there is a filter...
+    if(!empty( $this->export_in_categories)){
+      
+      foreach ( $this->export_in_categories as $item ) {
+        $cats = get_term( $item, 'category' );
+        $cats_name .= $cats->name.', ';
+      }
+      // remove last commasign in str
+      $in_category_name = substr( $cats_name, 0, -2 );
+    }
+
     $i = 0;
     $export = array();
     foreach ($posts as $p) {
@@ -250,20 +274,15 @@ if( class_exists( 'STC_Settings' ) ) {
 
       $export[$i]['id'] = $p->ID;
       $export[$i]['email'] = $p->post_title;
-      $export[$i]['categories'] = $in_categories;
-      $export[$i]['created'] = $p->post_date;
+      $export[$i]['user_categories'] = $in_categories;
+      $export[$i]['subscription_date'] = $p->post_date;
       
       $i++;
     }
-    //util::debug( $export );
-
-/*
-    $results = $wpdb->get_results( "SELECT * FROM $table", ARRAY_A );
     
       // filename for download 
-      */
       $time = date('Ymd_His'); 
-      $filename = $time . '.xls';
+      $filename = STC_SLUG . '_' . $time . '.xls';
 
       header("Content-Disposition: attachment; filename=\"$filename\""); 
       header("Content-Type:   application/vnd.ms-excel; ");
@@ -271,6 +290,11 @@ if( class_exists( 'STC_Settings' ) ) {
 
 
       $flag = false; 
+
+      // print out filtered categories if there is
+      if(!empty( $in_category_name ))
+        echo "\r\n", __('Filtered by: ', STC_TEXTDOMAIN ) . utf8_decode( $in_category_name ); 
+      
       foreach ($export as $row ) {
         if(! $flag ) { 
           // display field/column names as first row 

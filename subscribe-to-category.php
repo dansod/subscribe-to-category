@@ -12,6 +12,7 @@
 
 
   define( 'STC_TEXTDOMAIN', 'stc_textdomain' );
+  define( 'STC_SLUG', 'stc' );
   define( 'STC_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
   define( 'STC_PLUGIN_PATH', dirname( __FILE__ ) );
 
