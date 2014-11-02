@@ -293,7 +293,7 @@ if( class_exists( 'STC_Settings' ) ) {
 
       // print out filtered categories if there is
       if(!empty( $in_category_name ))
-        echo "\r\n", __('Filtered by: ', STC_TEXTDOMAIN ) . utf8_decode( $in_category_name ); 
+        echo "\r\n", utf8_decode( __('Filtered by: ', STC_TEXTDOMAIN ) ) . utf8_decode( $in_category_name ); 
       
       foreach ($export as $row ) {
         if(! $flag ) { 

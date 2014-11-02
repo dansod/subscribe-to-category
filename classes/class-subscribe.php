@@ -29,7 +29,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
   	 */
   	private function init(){
 
-      add_action( 'init', array( $this, 'register_post_type') );
+      add_action( 'init', array( $this, 'register_post_type'), 99 );
       add_action( 'create_category', array( $this, 'update_subscriber_categories') );
 
       add_action( 'wp', array( $this, 'collect_get_data' ) );
@@ -618,9 +618,9 @@ if( class_exists( 'STC_Subscribe' ) ) {
   	public function register_post_type(){
 
 			$labels = array( 
-			    'name' => _x( 'Subscribers', STC_TEXTDOMAIN ),
-			    'singular_name' => _x( 'Subscribe', STC_TEXTDOMAIN ),
-			    'add_new' => _x( 'Add new subscriber', STC_TEXTDOMAIN ),
+			    'name' => __( 'Subscribers', STC_TEXTDOMAIN ),
+			    'singular_name' => __( 'Subscribe', STC_TEXTDOMAIN ),
+			    'add_new' => __( 'Add new subscriber', STC_TEXTDOMAIN ),
 			    'add_new_item' => __( 'Add new subscriber', STC_TEXTDOMAIN ),
 			    'edit_item' => __( 'Edit subscriber', STC_TEXTDOMAIN ),
 			    'new_item' => __( 'New subscriber', STC_TEXTDOMAIN ),
@@ -635,7 +635,8 @@ if( class_exists( 'STC_Subscribe' ) ) {
 			    'labels' => $labels,
 			    'hierarchical' => true,
 			    'supports' => array( 'title' ),
-			    'public' => true,
+			    'public' => false,
+          'menu_icon' => 'dashicons-groups',
 			    'show_ui' => true,
 			    'show_in_menu' => true,
 			    'show_in_nav_menus' => true,
