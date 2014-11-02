@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Subscribe to Category v1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2014-10-30 10:50:29+0000\n"
+"PO-Revision-Date: 2014-11-02 08:53:11+0000\n"
 "Last-Translator: adminccsuser <daniel.soderstrom@cybercom.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -20,158 +20,236 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Textdomain-Support: yes"
 
-#: classes/class-cron.php:160
+#: classes/class-cron.php:136
 #@ stc_textdomain
 msgid "Click here to read full story"
 msgstr "Klicka här för att läsa hela artikeln"
 
-#: classes/class-cron.php:161
-#: classes/class-subscribe.php:454
+#: classes/class-cron.php:137
+#: classes/class-subscribe.php:579
 #@ stc_textdomain
 msgid "Unsubscribe me"
 msgstr "Avanmäl mig"
 
-#: classes/class-subscribe.php:84
+#: classes/class-subscribe.php:115
 #@ stc_textdomain
 msgid "Thanks for your subscription!"
 msgstr "Tack för din anmälan!"
 
-#: classes/class-subscribe.php:85
+#: classes/class-subscribe.php:116
 #@ stc_textdomain
 msgid "If you want to unsubscribe there is a link for unsubscription attached in the email."
 msgstr "Om du vill avanmäla dig från prenumerationstjänsten finns det en länk bifogad i e-postmeddelandet du kommer att erhålla i samband med utskick."
 
-#: classes/class-subscribe.php:115
+#: classes/class-subscribe.php:148
 #, php-format
 #@ stc_textdomain
 msgid "We have successfully removed your email %s from our database."
 msgstr "Vi har tagit bort din e-postadress %s från vår databas."
 
-#: classes/class-subscribe.php:170
-#: classes/class-subscribe.php:192
+#: classes/class-subscribe.php:203
+#: classes/class-subscribe.php:225
 #, php-format
 #@ stc_textdomain
 msgid "Unsubscribe from %s"
 msgstr "Avanmäl mig från %s"
 
-#: classes/class-subscribe.php:193
+#: classes/class-subscribe.php:226
 #@ stc_textdomain
 msgid "Follow this link to confirm your unsubscription"
 msgstr "Följ denna länk för att fullfölja din avanmälan"
 
-#: classes/class-subscribe.php:216
 #: classes/class-subscribe.php:249
+#: classes/class-subscribe.php:282
+#: classes/class-subscribe.php:407
 #@ stc_textdomain
 msgid "You need to enter a valid email address"
 msgstr "Du behöver ange en giltig e-postadress"
 
-#: classes/class-subscribe.php:233
+#: classes/class-subscribe.php:266
 #@ stc_textdomain
 msgid "We have received your request to unsubscribe from our newsfeed. Please check your email and confirm your unsubscription."
 msgstr "Vi har mottagit din förfrågan om avanmälan från prenumerationstjänsten och skickat ett e-postmeddelande om hur du fullföljer din avanmälan."
 
-#: classes/class-subscribe.php:261
+#: classes/class-subscribe.php:294
 #@ stc_textdomain
 msgid "You need to select some categories"
 msgstr "Du behöver välja en eller flera kategorier"
 
-#: classes/class-subscribe.php:447
+#: classes/class-subscribe.php:572
 #@ stc_textdomain
 msgid "E-mail Address: "
 msgstr "E-postadress:"
 
-#: classes/class-subscribe.php:459
+#: classes/class-subscribe.php:584
 #@ stc_textdomain
 msgid "Categories"
 msgstr "Kategorier"
 
-#: classes/class-subscribe.php:480
+#: classes/class-subscribe.php:605
 #@ stc_textdomain
 msgid "Subscribe me"
 msgstr "Prenumerera"
 
-#: classes/class-subscribe.php:481
+#: classes/class-subscribe.php:606
 #@ stc_textdomain
 msgid "Unsubscribe"
 msgstr "Avanmäl"
 
-#: classes/class-settings.php:32
+#: classes/class-settings.php:42
 #@ stc_textdomain
 msgid "Subscribe to Category"
 msgstr "Prenumerera på en kategori"
 
-#: classes/class-settings.php:33
+#: classes/class-settings.php:43
 #@ stc_textdomain
 msgid "Subscribe"
 msgstr "Prenumerera"
 
-#: classes/class-settings.php:51
+#: classes/class-settings.php:61
 #@ stc_textdomain
 msgid "Settings for subscribe to category"
 msgstr "Inställningar för Subscribe to Category"
 
-#: classes/class-settings.php:78
+#: classes/class-settings.php:84
 #@ stc_textdomain
 msgid "E-mail settings"
 msgstr "E-postinställningar"
 
-#: classes/class-settings.php:86
+#: classes/class-settings.php:108
 #@ stc_textdomain
 msgid "E-mail from: "
 msgstr "E-postadress från:"
 
-#: classes/class-settings.php:118
+#: classes/class-settings.php:168
 #@ stc_textdomain
 msgid "Add your E-mail settings"
 msgstr "Lägg till e-postinställningar"
 
-#: classes/class-subscribe.php:225
+#: classes/class-subscribe.php:258
 #@ stc_textdomain
 msgid "Email address not found in database"
 msgstr "E-postadressen kunde ej hittas i vår databas"
 
-#: classes/class-subscribe.php:463
+#: classes/class-subscribe.php:588
 #@ stc_textdomain
 msgid "All categories"
 msgstr "Alla kategorier"
 
-#: classes/class-subscribe.php:499
+#: classes/class-subscribe.php:624
 #@ stc_textdomain
 msgid "Add new subscriber"
 msgstr "Lägg till ny prenumerant"
 
-#: classes/class-subscribe.php:500
+#: classes/class-subscribe.php:625
 #@ stc_textdomain
 msgid "Edit subscriber"
 msgstr "Ändra prenumerant"
 
-#: classes/class-subscribe.php:501
+#: classes/class-subscribe.php:626
 #@ stc_textdomain
 msgid "New subscriber"
 msgstr "Ny prenumerant"
 
-#: classes/class-subscribe.php:502
+#: classes/class-subscribe.php:627
 #@ stc_textdomain
 msgid "Show subscriber"
 msgstr "Visa prenumeranter"
 
-#: classes/class-subscribe.php:503
+#: classes/class-subscribe.php:628
 #@ stc_textdomain
 msgid "Search subscribers"
 msgstr "Sök prenumeranter"
 
-#: classes/class-subscribe.php:504
+#: classes/class-subscribe.php:629
 #@ stc_textdomain
 msgid "Not found"
 msgstr "Kunde ej hittas"
 
-#: classes/class-subscribe.php:505
+#: classes/class-subscribe.php:630
 #@ stc_textdomain
 msgid "Nothing found in trash"
 msgstr "Papperskorgen är tom"
 
-#: classes/class-subscribe.php:506
+#: classes/class-subscribe.php:631
 #@ stc_textdomain
 msgid "Subscribers"
 msgstr "Prenumeranter"
+
+#: classes/class-settings.php:92
+#@ stc_textdomain
+msgid "Stylesheet (CSS) settings"
+msgstr "Inställning för CSS"
+
+#: classes/class-settings.php:99
+#@ stc_textdomain
+msgid "Custom CSS: "
+msgstr "STC stylesheet:"
+
+#: classes/class-settings.php:116
+#@ stc_textdomain
+msgid "Title: "
+msgstr "Titel:"
+
+#: classes/class-settings.php:146
+#@ stc_textdomain
+msgid "You have entered an invalid email."
+msgstr "Du har engett en felaktig e-postadress."
+
+#: classes/class-settings.php:178
+#: classes/class-settings.php:188
+#, php-format
+#@ stc_textdomain
+msgid "Enter the e-mail address for the sender, if empty the admin e-mail address %s is going to be used as sender."
+msgstr "Ange den e-postadress som ska användas som avsändare, som standard används administratörens e-post %s."
+
+#: classes/class-settings.php:197
+#@ stc_textdomain
+msgid "Exclude custom CSS"
+msgstr "Exkludera STC CSS"
+
+#: classes/class-settings.php:198
+#@ stc_textdomain
+msgid "Check this option if your theme supports Bootstrap framework or if you want to place your own CSS for Subscribe to Category in your theme."
+msgstr "Använd detta alternativ om ditt tema använder Bootstrap ramverket eller om du vill använda egen css för Subscribe to Category i ditt tema."
+
+#: classes/class-settings.php:208
+#@ stc_textdomain
+msgid "Export"
+msgstr "Exportera"
+
+#: classes/class-settings.php:213
+#@ stc_textdomain
+msgid "Export options"
+msgstr "Exportalternativ"
+
+#: classes/class-settings.php:215
+#@ stc_textdomain
+msgid "Export to Excel"
+msgstr "Exportera till Excel"
+
+#: classes/class-subscribe.php:92
+#@ stc_textdomain
+msgid "Take me to start page"
+msgstr "Till startsidan"
+
+#: classes/class-subscribe.php:140
+#@ default
+msgid "We are sorry but something went wrong with your unsubscription."
+msgstr ""
+
+#: classes/class-subscribe.php:414
+#@ stc_textdomain
+msgid "E-mail address already exists"
+msgstr "E-postadressen finns redan registrerad"
+
+#: classes/class-subscribe.php:418
+#@ stc_textdomain
+msgid "No categories are selected"
+msgstr "Inga kategorier valda"
+
+#: classes/class-subscribe.php:459
+#@ stc_textdomain
+msgid " - this post is set to draft"
+msgstr "- inläggets status är ändrat till utkast."
 

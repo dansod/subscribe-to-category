@@ -31,7 +31,13 @@ if( class_exists( 'STC_Settings' ) ) {
      * Add options page
      */
     public function add_plugin_page() {
-
+      
+      if( isset( $_POST['action'] ) && $_POST['action'] == 'export' ){
+        if( $_POST['export_to_excel'] == 1 )
+          $this->export_to_excel();
+      }
+      
+      //$this->export_to_excel();
       add_options_page(
           __( 'Subscribe to Category', STC_TEXTDOMAIN ), 
           __( 'Subscribe', STC_TEXTDOMAIN ), 
@@ -46,7 +52,7 @@ if( class_exists( 'STC_Settings' ) ) {
      * Options page callback
      */
     public function create_admin_page() {
-      
+
       // Set class property
       $this->options = get_option( 'stc_settings' );
       ?>
@@ -62,6 +68,7 @@ if( class_exists( 'STC_Settings' ) ) {
             submit_button(); 
         ?>
         </form>
+        <?php $this->export_to_excel_form(); ?>
       </div>
       <?php
     }
@@ -193,6 +200,101 @@ if( class_exists( 'STC_Settings' ) ) {
 
     <?php
     }
+
+
+
+    public function export_to_excel_form(){
+      ?>
+      <h3><?php _e( 'Export', STC_TEXTDOMAIN ); ?></h3>
+      <form method="post" action="options-general.php?page=stc-subscribe-settings">
+      <table class="form-table">
+        <tbody>
+          <tr>
+            <th scope="row"><?php _e('Export options', STC_TEXTDOMAIN ); ?></th>
+            <td>
+              <label for="export-to-excel"><input type="checkbox" name="export_to_excel" id="export-to-excel" value="1"><?php _e( 'Export to Excel', STC_TEXTDOMAIN ); ?></label>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <input type="hidden" value="export" name="action">
+      <input type="submit" value="Export to Excel" class="button button-primary" id="submit" name="">
+      </form>
+      
+      <?php
+    }
+
+
+  /**
+   * Export method for excel
+   */
+  public function export_to_excel(){
+    //global $wpdb;
+    //
+    $args = array(
+      'post_type'     => 'stc',
+      'post_status'   => 'publish',
+    );
+
+    $posts = get_posts( $args );
+    $i = 0;
+    $export = array();
+    foreach ($posts as $p) {
+      
+      $cats = get_the_category( $p->ID ); 
+      foreach ($cats as $c) {
+        $c_name .= $c->name . ', ';
+      }
+      $in_categories = substr( $c_name, 0, -2);
+      $c_name = false; // unset variable
+
+      $export[$i]['id'] = $p->ID;
+      $export[$i]['email'] = $p->post_title;
+      $export[$i]['categories'] = $in_categories;
+      $export[$i]['created'] = $p->post_date;
+      
+      $i++;
+    }
+    //util::debug( $export );
+
+/*
+    $results = $wpdb->get_results( "SELECT * FROM $table", ARRAY_A );
+    
+      // filename for download 
+      */
+      $time = date('Ymd_His'); 
+      $filename = $time . '.xls';
+
+      header("Content-Disposition: attachment; filename=\"$filename\""); 
+      header("Content-Type:   application/vnd.ms-excel; ");
+      header("Content-type:   application/x-msexcel; ");
+
+
+      $flag = false; 
+      foreach ($export as $row ) {
+        if(! $flag ) { 
+          // display field/column names as first row 
+          echo "\r\n" . implode("\t", array_keys( $row )) . "\r\n"; 
+          $flag = true; 
+        } 
+
+        array_walk($row, array($this, 'clean_data_for_excel') ); 
+        echo implode("\t", array_values($row) ). "\r\n"; 
+      } 
+
+      exit;
+
+    }
+
+     
+     public function clean_data_for_excel( &$str ) { 
+      $str = iconv('UTF-8', 'ISO-8859-1', $str );
+      $str = preg_replace("/\t/", "\\t", $str ); 
+      $str = preg_replace("/\r?\n/", "\\n", $str ); 
+    } 
+
+
+
 
 
   }
