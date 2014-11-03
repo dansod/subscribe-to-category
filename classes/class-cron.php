@@ -92,6 +92,10 @@
       $emails = array_intersect_key( $emails , array_unique( array_map('serialize' , $emails ) ) ); 
 
       $website_name = get_bloginfo( 'name' );
+      $email_title = $this->settings['title'];
+      echo $email_title;
+
+      
 
       $email_from = $this->settings['email_from'];
       if( !is_email( $email_from ) )
@@ -104,18 +108,21 @@
       // loop through subscribers and send notice
       foreach ($emails as $email ) {
 
-        //wp_mail( $email['email'], 'Automatic email ' . $email['email'], 'Automatic scheduled email from WordPress.');
-
         ob_start(); // start buffering and get content
         $this->email_html_content( $email );
         $message = ob_get_contents();
         ob_get_clean();
 
-        $subject = '=?UTF-8?B?'.base64_encode( $email['post']->post_title ).'?=';
+        $email_subject = $email_title;
+        if( empty( $email_title ))
+          $email_subject = $email['post']->post_title;
+
+        $subject = '=?UTF-8?B?'.base64_encode( $email_subject ).'?=';
+
         wp_mail( $email['email'], $subject, $message, $headers );
 
       }
-      
+
       //update some postmeta that email is sent
       foreach ($outbox as $post ) {
         update_post_meta( $post->ID, '_stc_notifier_status', 'sent' );
