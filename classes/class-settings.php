@@ -64,6 +64,7 @@ if( class_exists( 'STC_Settings' ) ) {
       <div class="wrap">
         <?php screen_icon(); ?>
         <h2><?php _e('Settings for subscribe to category', STC_TEXTDOMAIN ); ?></h2>           
+     
         <form method="post" action="options.php">
         <?php
             // print out all hidden setting fields
@@ -74,9 +75,31 @@ if( class_exists( 'STC_Settings' ) ) {
         ?>
         </form>
         <?php $this->export_to_excel_form(); ?>
+
       </div>
       <?php
     }
+
+
+    /**
+ * Returns the time in seconds until a specified cron job is scheduled.
+ *
+ *@param string $cron_name The name of the cron job
+ *@return int|bool The time in seconds until the cron job is scheduled. False if
+ *it could not be found.
+*/
+function sh_get_next_cron_time( $cron_name ){
+
+    foreach( _get_cron_array() as $timestamp => $crons ){
+
+        if( in_array( $cron_name, array_keys( $crons ) ) ){
+            return $timestamp - time();
+        }
+
+    }
+
+    return false;
+}
 
     /**
      * Register and add settings
@@ -118,7 +141,7 @@ if( class_exists( 'STC_Settings' ) ) {
 
         add_settings_field(
             'stc_title',
-            __( 'Title: ', STC_TEXTDOMAIN ),
+            __( 'Email subject: ', STC_TEXTDOMAIN ),
             array( $this, 'stc_title_callback' ), // Callback
             'stc-subscribe-settings', // Page
             'setting_email_id' // Section           
@@ -190,7 +213,7 @@ if( class_exists( 'STC_Settings' ) ) {
     public function stc_title_callback() {
       ?>
         <input type="text" id="email_from" class="regular-text" name="stc_settings[title]" value="<?php echo isset( $this->options['title'] ) ? esc_attr( $this->options['title'] ) : '' ?>" />
-        <p class="description"><?php printf( __( 'Enter the e-mail address for the sender, if empty the admin e-mail address %s is going to be used as sender.', STC_TEXTDOMAIN ), $default_email ); ?></p>
+        <p class="description"><?php printf( __( 'Enter e-mail subject for the e-mail notification, leave empty if you wish to use post title as email subject.', STC_TEXTDOMAIN ), $default_email ); ?></p>
         <?php
     }
 
