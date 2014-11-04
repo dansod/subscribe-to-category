@@ -24,8 +24,100 @@ if( class_exists( 'STC_Settings' ) ) {
       if( is_admin() ) {    
         add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
         add_action( 'admin_init', array( $this, 'register_settings' ) );
+        add_action( 'init', array( $this, 'get_requests'), 10); // $_GET
+        add_action( 'init', array( $this, 'get_transients'), 99); // transients
+
       }
 
+
+    }
+
+    /**
+     * Getting $_GET requests
+     */
+    public function get_requests(){
+      
+
+      // running cron manually 
+      if( isset($_GET['action']) && $_GET['action']=='run-stc-cron') {
+
+        // security check
+        if( !current_user_can('manage_options') ) 
+          die(__( 'You are not allowed to run cron events.', STC_TEXTDOMAIN ));
+
+        // check nonce
+        check_admin_referer('stc_run_cron');
+
+        // init cron class and run cron
+        $cron = STC_Cron::get_instance();
+
+        if( $cron->run_cron() ){
+          $url = admin_url( 'options-general.php?page=stc-subscribe-settings' );
+          // set transient for showing admin notice in settings
+          set_transient( 'stc_notice_id', '1', 3600 );
+          wp_redirect( $url );
+          exit;
+        
+        }else{
+          $url = admin_url( 'options-general.php?page=stc-subscribe-settings' );
+          // set transient for showing admin notice in settings
+          set_transient( 'stc_notice_id', '0', 3600 );
+          wp_redirect( $url );
+          exit;
+
+        }
+
+
+      }
+ 
+    }
+
+    /**
+     * Get transients 
+     */
+    public function get_transients(){
+
+      $notice = get_transient( 'stc_notice_id' );
+
+      // add action for admin_notices if there is a transient set
+      if( !empty( $notice ) ){
+        add_action( 'admin_notices', array( $this, 'stc_admin_notice' ) );
+      }
+
+      return false;
+    }
+
+
+    /**
+     * Prints out admin notice in settings
+     */
+    public function stc_admin_notice(){
+
+      $notice = $this->get_admin_notice( get_transient('stc_notice_id') );
+
+      $notice_class = 'updated';
+      if( get_transient('stc_notice_id') == 0 ){
+        $notice_class = 'error';
+      }
+
+      printf( '<div id="message" class="%s"><p><strong>%s</strong></p></div>', $notice_class, $notice );
+      delete_transient( 'stc_notice_id' );
+      
+    }
+
+    /**
+     * Returns messages to show in admin notice
+     * 
+     * @param  int $notice_id
+     * @return array with notice id
+     */
+    public function get_admin_notice( $notice_id ){
+      $notice = array(
+        __( 'Something went wrong when triggering scheduled event', STC_TEXTDOMAIN ),
+        __( 'Scheduled event successfully executed', STC_TEXTDOMAIN )
+      );
+      
+      return $notice[$notice_id];
     }
 
     /**
@@ -60,11 +152,32 @@ if( class_exists( 'STC_Settings' ) ) {
 
       // Set class property
       $this->options = get_option( 'stc_settings' );
+      $time_in_seconds_i18n = strtotime( date_i18n( 'Y-m-d H:i:s' ) ) + $this->get_next_cron_time( 'stc_schedule_email' );
+      $next_run = gmdate( 'Y-m-d H:i:s', $time_in_seconds_i18n ); 
       ?>
       <div class="wrap">
         <?php screen_icon(); ?>
-        <h2><?php _e('Settings for subscribe to category', STC_TEXTDOMAIN ); ?></h2>           
-     
+        <h2><?php _e('Settings for subscribe to category', STC_TEXTDOMAIN ); ?></h2>       
+
+
+        <table class="widefat">
+          <tbody>
+            <tr>
+              <td class="desc"><strong><?php _e( 'Schedule: ', STC_TEXTDOMAIN ); ?></strong> <?php printf( __('E-mail is scheduled to be sent once every hour. Next run is going to be <strong>%s</strong>', STC_TEXTDOMAIN ), $next_run ); ?></td>
+              <td class="desc"></td>
+              <td class="desc textright"><a href="<?php echo wp_nonce_url('options-general.php?page=stc-subscribe-settings&action=run-stc-cron', 'stc_run_cron');?>"> <?php _e( 'Click here to run scheduled event right now', STC_TEXTDOMAIN ); ?></a></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="panel">    
+        
+
+    
+
+        
+        </div>
+
         <form method="post" action="options.php">
         <?php
             // print out all hidden setting fields
@@ -82,24 +195,19 @@ if( class_exists( 'STC_Settings' ) ) {
 
 
     /**
- * Returns the time in seconds until a specified cron job is scheduled.
- *
- *@param string $cron_name The name of the cron job
- *@return int|bool The time in seconds until the cron job is scheduled. False if
- *it could not be found.
-*/
-function sh_get_next_cron_time( $cron_name ){
+     * Returns the time in seconds until a specified cron job is scheduled.
+    */
+    public function get_next_cron_time( $cron_name ){
 
-    foreach( _get_cron_array() as $timestamp => $crons ){
+      foreach( _get_cron_array() as $timestamp => $crons ){
 
         if( in_array( $cron_name, array_keys( $crons ) ) ){
-            return $timestamp - time();
+          return $timestamp - time();
         }
+      }
 
+      return false;
     }
-
-    return false;
-}
 
     /**
      * Register and add settings

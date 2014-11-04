@@ -32,7 +32,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
       add_action( 'init', array( $this, 'register_post_type'), 99 );
       add_action( 'create_category', array( $this, 'update_subscriber_categories') );
 
-      add_action( 'wp', array( $this, 'collect_get_data' ) );
+      add_action( 'wp', array( $this, 'collect_get_data') );
   		add_action( 'wp', array( $this, 'collect_post_data') );
 
       add_action( 'save_post_stc', array( $this, 'save_post_stc') );
@@ -104,12 +104,16 @@ if( class_exists( 'STC_Subscribe' ) ) {
      */
     public function collect_get_data(){
 
-      if (isset($_GET['stc_nonce']) && wp_verify_nonce( $_GET['stc_nonce'], 'unsubscribe_user' )) {
+      if(empty( $_GET ))
+        return false;
+
+      //if (isset($_GET['stc_nonce2']) && wp_verify_nonce( $_GET['stc_nonce2'], 'unsubscribe_user2' )) {
+      if (isset($_GET['stc_nonce2']) ) {
         if(isset( $_GET['stc_user'] )){
           $this->unsubscribe_user();
           add_action( 'template_redirect', array( $this, 'unsubscribe_html' ) );
         }
-      }   
+      }
 
       if (isset( $_GET['stc_status'] ) && $_GET['stc_status'] == 'success' ) {
         $this->notice[] = __( 'Thanks for your subscription!', STC_TEXTDOMAIN );
@@ -223,7 +227,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
         return false;
       ?>
         <h3><?php printf( __('Unsubscribe from %s', STC_TEXTDOMAIN ), get_bloginfo( 'name' ) ); ?></h3>
-        <div style="margin-top: 20px;"><a href="<?php echo wp_nonce_url( get_bloginfo('url') . '?stc_user=' . $stc['hash'], 'unsubscribe_user', 'stc_nonce' ); ?>"><?php _e('Follow this link to confirm your unsubscription', STC_TEXTDOMAIN ); ?></a></div>
+        <div style="margin-top: 20px;"><a href="<?php echo wp_nonce_url( get_bloginfo('url') . '?stc_user=' . $stc['hash'], 'unsubscribe_users2', 'stc_nonce2' ); ?>"><?php _e('Follow this link to confirm your unsubscription', STC_TEXTDOMAIN ); ?></a></div>
       <?php
 
     }

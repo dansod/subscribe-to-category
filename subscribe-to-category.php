@@ -30,13 +30,11 @@
 
 
   /**
-   * Utility class
+   * Utility class  -printing out some debugging data
    */
-  class Util {  
-    
-    /**
-     * printing out some debugging data
-     */
+  
+  /*
+  class Util {    
     static function debug() {
       $args = func_get_args();
       
@@ -48,5 +46,6 @@
       
     }
   }
+  */
 
 ?>

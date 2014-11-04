@@ -11,7 +11,9 @@
   }
 
   class STC_Cron {
+    protected static $instance = null;
     private $settings = array();
+    public $cron_hook = 'stc_schedule_email';
 
     public function __construct(){
       $this->init(); 		
@@ -20,6 +22,45 @@
     public function init(){
       add_action( 'stc_schedule_email', array( $this, 'stc_send_email' ) );
       $this->settings = get_option( 'stc_settings' );
+    }
+
+    /**
+     * Single instance of this class.
+     */
+    public static function get_instance() {
+
+      // If the single instance hasn't been set, set it now.
+      if ( null == self::$instance ) {
+        self::$instance = new self;
+      }
+
+      return self::$instance;
+    }
+
+    /**
+     * Run a cron event immediately by scheduling a new single event with the same arguments.
+     */
+    public function run_cron() {
+      $cron_hook = $this->cron_hook;
+      $crons = _get_cron_array();      
+      
+      foreach( $crons as $time => $cron ) {
+        // match and grab stc cron array 
+        if(isset($cron[$cron_hook])){
+
+          $cron_key = array_keys( $cron[$cron_hook] ); // get this cron key
+          $args = $cron[$cron_hook][$cron_key[0]]['args']; // get this cron args
+          delete_transient( 'doing_cron' ); // delete cron transient, see wp-cron.php
+          wp_schedule_single_event(time()-1, $cron_hook, $args); // schedule single event
+          spawn_cron(); // send request to run cron through HTTP 
+
+          return true;
+
+        }
+
+      }
+  
+        return false;
     }
 
     /**
@@ -92,10 +133,7 @@
       $emails = array_intersect_key( $emails , array_unique( array_map('serialize' , $emails ) ) ); 
 
       $website_name = get_bloginfo( 'name' );
-      $email_title = $this->settings['title'];
-      echo $email_title;
-
-      
+      $email_title = $this->settings['title'];      
 
       $email_from = $this->settings['email_from'];
       if( !is_email( $email_from ) )
