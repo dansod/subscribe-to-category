@@ -274,11 +274,12 @@ if( class_exists( 'STC_Settings' ) ) {
 
           // sanitize email input
           $output['email_from'] = sanitize_email( $input['email_from'] ); 
-
-          if ( is_email( $output['email_from'] ) || !empty( $output['email_from'] ) )
-            $output['email_from'] = $input['email_from'];
-          else
-            add_settings_error( 'setting_email_id', 'invalid-email', __( 'You have entered an invalid email.', STC_TEXTDOMAIN ) );
+          
+          if(! empty( $input['email_from'] )){
+            if ( ! is_email( $output['email_from'] ) ){
+              add_settings_error( 'setting_email_id', 'invalid-email', __( 'You have entered an invalid email.', STC_TEXTDOMAIN ) );
+            }
+          }
         }
 
         if( isset( $input['title'] ) ){
