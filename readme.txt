@@ -14,7 +14,10 @@ This plugin lets a user subscribe to posts within a certain category or categori
 This plugin lets a user subscribe to posts within a certain category or categories.
 - Subscribe and unsubscribe functions
 - Prepared for Bootstrap framework
-- Using cron to send the email notice every hour if there are posts to send.
+- Scheduled event - Cron job
+-- Sending e-mail is scheduled to be sent once every hour.
+-- Admin has the possibillity to manually trigger the cron job to send e-mails in que.
+-- Notice in settings when next scheduled event is fired.
 - Settings for email sender address (default admin email)
 - Settings for email title (default post title)
 - Settings for custom CSS
