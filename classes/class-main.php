@@ -199,7 +199,7 @@ class STC_Main {
 	public function enqueue_styles() {
 		$options = $this->options;
 		
-		if( $options['exclude_css'] == false ) // check options for css
+		if( isset($options['exclude_css']) && $options['exclude_css'] == false ) // check options for css
 			wp_enqueue_style( 'stc-style', STC_PLUGIN_URL . '/css/stc-style.css', array() );
 	}
 

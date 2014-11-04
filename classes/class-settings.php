@@ -268,7 +268,6 @@ if( class_exists( 'STC_Settings' ) ) {
      * @param array $input 
      */
     public function input_validate_sanitize( $input ) {
-        //util::debug( $input );
         $output = array();
 
         if( isset( $input['email_from'] ) ){
@@ -280,8 +279,6 @@ if( class_exists( 'STC_Settings' ) ) {
             $output['email_from'] = $input['email_from'];
           else
             add_settings_error( 'setting_email_id', 'invalid-email', __( 'You have entered an invalid email.', STC_TEXTDOMAIN ) );
-
-
         }
 
         if( isset( $input['title'] ) ){
@@ -321,7 +318,7 @@ if( class_exists( 'STC_Settings' ) ) {
     public function stc_title_callback() {
       ?>
         <input type="text" id="email_from" class="regular-text" name="stc_settings[title]" value="<?php echo isset( $this->options['title'] ) ? esc_attr( $this->options['title'] ) : '' ?>" />
-        <p class="description"><?php printf( __( 'Enter e-mail subject for the e-mail notification, leave empty if you wish to use post title as email subject.', STC_TEXTDOMAIN ), $default_email ); ?></p>
+        <p class="description"><?php _e( 'Enter e-mail subject for the e-mail notification, leave empty if you wish to use post title as email subject.', STC_TEXTDOMAIN ); ?></p>
         <?php
     }
 

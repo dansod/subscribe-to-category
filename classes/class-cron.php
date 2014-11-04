@@ -179,7 +179,7 @@
       <h3><a href="<?php get_permalink( $email['post_id']) ?>"><?php echo $email['post']->post_title; ?></a></h3>
       <div><?php echo apply_filters('the_content', $this->string_cut( $email['post']->post_content, 130 ) );?></div>
       <div style="border-bottom: 1px solid #cccccc; padding-bottom: 10px;"><a href="<?php echo get_permalink( $email['post_id'] ); ?>"> <?php _e('Click here to read full story', STC_TEXTDOMAIN ); ?></a></div>
-      <div style="margin-top: 20px;"><a href="<?php echo wp_nonce_url( get_bloginfo('url') . '?stc_user=' . $email['hash'], 'unsubscribe_user', 'stc_nonce' ); ?>"><?php _e('Unsubscribe me', STC_TEXTDOMAIN ); ?></a></div>
+      <div style="margin-top: 20px;"><a href="<?php echo wp_nonce_url( get_bloginfo('url') . '?stc_user=' . $email['hash'], 'stc_unsubscribe_user', 'stc_nonce' ); ?>"><?php _e('Unsubscribe me', STC_TEXTDOMAIN ); ?></a></div>
       <?php
     }
 

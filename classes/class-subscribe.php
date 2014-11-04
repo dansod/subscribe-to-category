@@ -86,7 +86,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
       global $post;
       get_header();
     ?>
-    <div id="stc-unsubscribe-wrappesr" class="">
+    <div id="stc-unsubscribe-wrapper" class="">
       <div class="alert alert-success text-center">
         <p><?php echo $this->notice[0]; ?></p>
         <p><a href="<?php echo get_bloginfo('url'); ?>"><?php _e( 'Take me to start page', STC_TEXTDOMAIN ); ?></a></p>
@@ -106,9 +106,15 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
       if(empty( $_GET ))
         return false;
-
-      //if (isset($_GET['stc_nonce2']) && wp_verify_nonce( $_GET['stc_nonce2'], 'unsubscribe_user2' )) {
-      if (isset($_GET['stc_nonce2']) ) {
+/*
+       if (isset($_GET['stc_nonce']) && wp_verify_nonce( $_GET['stc_nonce'], 'stc_unsubscribe_user' )) {
+        echo "ok";
+       }else{
+        echo "fle";
+       }
+*/
+      if (isset($_GET['stc_nonce']) && wp_verify_nonce( $_GET['stc_nonce'], 'stc_unsubscribe_user' )) {
+      
         if(isset( $_GET['stc_user'] )){
           $this->unsubscribe_user();
           add_action( 'template_redirect', array( $this, 'unsubscribe_html' ) );
@@ -225,9 +231,10 @@ if( class_exists( 'STC_Subscribe' ) ) {
     private function email_html_content( $stc = '' ){
       if(empty( $stc ))
         return false;
+      
       ?>
         <h3><?php printf( __('Unsubscribe from %s', STC_TEXTDOMAIN ), get_bloginfo( 'name' ) ); ?></h3>
-        <div style="margin-top: 20px;"><a href="<?php echo wp_nonce_url( get_bloginfo('url') . '?stc_user=' . $stc['hash'], 'unsubscribe_users2', 'stc_nonce2' ); ?>"><?php _e('Follow this link to confirm your unsubscription', STC_TEXTDOMAIN ); ?></a></div>
+        <div style="margin-top: 20px;"><a href="<?php echo wp_nonce_url( get_bloginfo('url') . '?stc_user=' . $stc['hash'], 'stc_unsubscribe_user', 'stc_nonce' ); ?>"><?php _e('Follow this link to confirm your unsubscription', STC_TEXTDOMAIN ); ?></a></div>
       <?php
 
     }
@@ -296,6 +303,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
  					$data['categories'] = $_POST['stc_categories'];
  				else
  					$error[] = __( 'You need to select some categories', STC_TEXTDOMAIN );
+
 
         // save user to subscription post type if no error
  				if(empty( $error )){
@@ -384,9 +392,12 @@ if( class_exists( 'STC_Subscribe' ) ) {
     public function save_post_stc( $post_id ) {
       global $post;
 
-      
       // bail for bulk actions and auto-drafts
       if(empty( $_POST )) 
+        return false;
+
+      // only trigger this from admin
+      if( $_POST['post_type'] != 'stc' )
         return false;
 
       // Bail if we're doing an auto save  
