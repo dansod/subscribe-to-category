@@ -7,25 +7,24 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin lets a user subscribe to posts within a certain category or categories.
+Subscribe to posts within a certain category or categories.
 
 == Description ==
+This plugin lets a user subscribe and unsubscribe to posts within a certain category or categories. 
+Subscribers will recieve an e-mail with a link to the actual post. E-mails to subscribers are sent once every hour with WP Cron.
 
-This plugin lets a user subscribe to posts within a certain category or categories.
-- Subscribe and unsubscribe functions
-- Prepared for Bootstrap framework
-- Scheduled event - Cron job
--- Sending e-mail is scheduled to be sent once every hour.
--- Admin has the possibillity to manually trigger the cron job to send e-mails in que.
--- Notice in settings when next scheduled event is fired.
-- Settings for email sender address (default admin email)
-- Settings for email title (default post title)
-- Settings for custom CSS
-- Custom post type for subscribers
-- Possibility to translate to your own language, included languages (swedish, english)
-- Export to excel 
--- export all subscribers
--- export subscribers filtered by categories
+The HTML form is prepared for Bootstrap framework.
+
+Subscribers are saved as a custom post type with a possibillity to export(excel). Unsubscription needs to be confirmed by the subscriber.
+
+The following settings and features are available for the administrator in current version:
+* Change e-mail sender from default
+* Change the title/subject for e-mails
+* Turn CSS on/off
+* Export subscribers to Excel with a possibillity to filter by categories
+* Run the cron job manually so it will fire immediately
+* Theres a note when next scheduled event for sending e-mails to subscribers is running.
+* Options for leave no trace - deletes post meta and subscribers created by this plugin.
 
 == Installation ==
 
@@ -35,6 +34,10 @@ This section describes how to install the plugin and get it working.
 2. Activate the plugin through the 'Plugins' menu in WordPress Admin
 3. Save your settings 'Settings > Subscribe'.
 4. Create a page and add shortcode [stc-subscribe] to display stc form subscription.
+
+= Optionally but recommended =
+As Wordpress Cron is depending on that you have visits on your website you should set up a cron job on your server to hit http://yourdomain.com/wp-cron.php at a regular interval to make sure that WP Cron is running as expected. In current version of Subscribe to Category the WP Cron is running once every hour, that might be an option that is changeable in future versions. 
+Therefore a suggested interval for your server cron could be once every 5 minutes. 
 
 
 == Screenshots ==

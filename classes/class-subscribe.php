@@ -1,11 +1,15 @@
 <?php
-  /**
-   * 
-   * Class for subscribe
-   * @author Daniel Söderström <info@dcweb.nu>
-   * 
-   */
-  
+/**
+ * 
+ * Class for subscribe
+ * @author Daniel Söderström <info@dcweb.nu>
+ * 
+ */
+
+// If this file is called directly, abort.
+if ( !defined( 'WPINC' ) )
+  die();
+
 if( class_exists( 'STC_Subscribe' ) ) {
   $stc_subscribe = new STC_Subscribe();
 }
@@ -13,6 +17,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
   class STC_Subscribe {
 
+    protected static $instance = null;
   	private $data = array();
   	private $error = array();
     private $notice = array();
@@ -23,11 +28,26 @@ if( class_exists( 'STC_Subscribe' ) ) {
   		$this->init();
   	}
 
+    /**
+     * Single instance of this class.
+     */
+    public static function get_instance() {
+
+      // If the single instance hasn't been set, set it now.
+      if ( null == self::$instance ) {
+        self::$instance = new self;
+      }
+
+      return self::$instance;
+    }
+
   	/**
   	 * Init method
   	 * @return [type] [description]
   	 */
   	private function init(){
+
+
 
       add_action( 'init', array( $this, 'register_post_type'), 99 );
       add_action( 'create_category', array( $this, 'update_subscriber_categories') );
@@ -41,6 +61,8 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
   		add_shortcode( 'stc-subscribe', array( $this, 'stc_subscribe_render' ) );
       add_action( 'transition_post_status', array( $this, 'new_post_submit' ), 10, 3 );
+
+      add_action( 'stc_schedule_email', array( $this, 'stc_send_email' ) );
 
       // save settings to array
       $this->settings = get_option( 'stc_settings' );
@@ -93,7 +115,6 @@ if( class_exists( 'STC_Subscribe' ) ) {
       </div>
     </div>
       <?php
-      get_sidebar();
       get_footer();
       exit;
     }
@@ -106,21 +127,17 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
       if(empty( $_GET ))
         return false;
-/*
-       if (isset($_GET['stc_nonce']) && wp_verify_nonce( $_GET['stc_nonce'], 'stc_unsubscribe_user' )) {
-        echo "ok";
-       }else{
-        echo "fle";
-       }
-*/
-      if (isset($_GET['stc_nonce']) && wp_verify_nonce( $_GET['stc_nonce'], 'stc_unsubscribe_user' )) {
-      
-        if(isset( $_GET['stc_user'] )){
+
+      // unsubscription
+      if(isset( $_GET['stc_unsubscribe']) && strlen( $_GET['stc_unsubscribe'] ) === 32 && ctype_xdigit( $_GET['stc_unsubscribe'] ) ){
+        if(isset( $_GET['stc_user'] ) && is_email( $_GET['stc_user'] ) ){
           $this->unsubscribe_user();
           add_action( 'template_redirect', array( $this, 'unsubscribe_html' ) );
-        }
+        }       
+
       }
 
+      // notice on subscription
       if (isset( $_GET['stc_status'] ) && $_GET['stc_status'] == 'success' ) {
         $this->notice[] = __( 'Thanks for your subscription!', STC_TEXTDOMAIN );
         $this->notice[] = __( 'If you want to unsubscribe there is a link for unsubscription attached in the email.', STC_TEXTDOMAIN );
@@ -136,14 +153,16 @@ if( class_exists( 'STC_Subscribe' ) ) {
     private function unsubscribe_user(){
       global $wpdb;
       $meta_key = '_stc_hash';
-      $meta_value = $_GET['stc_user'];
+      $meta_value = $_GET['stc_unsubscribe'];
+      $stc_user = strtolower( $_GET['stc_user'] );
 
       $user_id = $wpdb->get_var( $wpdb->prepare(
         "SELECT id FROM $wpdb->posts AS post 
         LEFT JOIN $wpdb->postmeta AS meta ON post.ID = meta.post_id 
         WHERE meta.meta_key = %s AND meta.meta_value = %s 
-        AND post.post_type = %s
-        ", $meta_key, $meta_value, $this->post_type )
+        AND post.post_type = %s 
+        AND post.post_title = %s
+        ", $meta_key, $meta_value, $this->post_type, $stc_user )
       );
 
       if(empty( $user_id )){
@@ -152,12 +171,12 @@ if( class_exists( 'STC_Subscribe' ) ) {
       }
     
 
-        $subscriber_email = get_the_title( $user_id );
-        wp_delete_post( $user_id );
+      $subscriber_email = get_the_title( $user_id );
+      wp_delete_post( $user_id );
 
-        $notice[] = sprintf( __( 'We have successfully removed your email %s from our database.', STC_TEXTDOMAIN ), '<span class="stc-notice-email">' . $subscriber_email . '</span>' );
-        
-        return $this->notice = $notice;
+      $notice[] = sprintf( __( 'We have successfully removed your email %s from our database.', STC_TEXTDOMAIN ), '<span class="stc-notice-email">' . $subscriber_email . '</span>' );
+      
+      return $this->notice = $notice;
 
     }
 
@@ -214,7 +233,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
 
       ob_start(); // start buffer
-      $this->email_html_content( $stc );
+      $this->email_html_unsubscribe( $stc );
       $message = ob_get_contents();
       ob_get_clean();
       
@@ -228,17 +247,16 @@ if( class_exists( 'STC_Subscribe' ) ) {
      * @param  array $stc 
      * @return string
      */
-    private function email_html_content( $stc = '' ){
+    private function email_html_unsubscribe( $stc = '' ){
       if(empty( $stc ))
         return false;
       
       ?>
         <h3><?php printf( __('Unsubscribe from %s', STC_TEXTDOMAIN ), get_bloginfo( 'name' ) ); ?></h3>
-        <div style="margin-top: 20px;"><a href="<?php echo wp_nonce_url( get_bloginfo('url') . '?stc_user=' . $stc['hash'], 'stc_unsubscribe_user', 'stc_nonce' ); ?>"><?php _e('Follow this link to confirm your unsubscription', STC_TEXTDOMAIN ); ?></a></div>
+        <div style="margin-top: 20px;"><a href="<?php echo get_bloginfo('url') . '/?stc_unsubscribe=' . $stc['hash'] . '&stc_user=' . $stc['email'] ?>"><?php _e('Follow this link to confirm your unsubscription', STC_TEXTDOMAIN ); ?></a></div>
       <?php
 
     }
-
 
     /**
      * Collect data from _POST for subscription
@@ -385,7 +403,6 @@ if( class_exists( 'STC_Subscribe' ) ) {
   	
   	}
 
-
     /**
      * Save post for stc post_type from admin
      */
@@ -447,12 +464,11 @@ if( class_exists( 'STC_Subscribe' ) ) {
         return false;
       }
 
-
       // no errors, continue 
       // is there a hash for user
       $hash_exists = get_post_meta( $post_id, '_stc_hash', true );
       if( empty( $hash_exists ))
-        update_post_meta( $post_id, '_stc_hash', md5( $data['email'].time() ) );
+        update_post_meta( $post_id, '_stc_hash', md5( $this->data['email'].time() ) );
 
 
       // check if user has all categories and update post meta if true
@@ -469,7 +485,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
     public function save_post_stc_error(){
 
       if ( get_transient( 'error' ) ) {
-        $error = get_transient('error' );
+        $error = get_transient( 'error' );
 
         $error .= __( ' - this post is set to draft', STC_TEXTDOMAIN );
         printf( '<div id="message" class="error"><p><strong>%s</strong></p></div>', $error );
@@ -626,6 +642,197 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
   		<?php
   	}
+
+
+    /**
+     * On the scheduled action hook, run a function.
+     */
+    public function stc_send_email() {
+      global $wpdb;
+
+      // get posts with a post meta value in outbox
+      $meta_key = '_stc_notifier_status';
+      $meta_value = 'outbox';
+
+      $args = array(
+        'post_type'   => 'post',
+        'post_status' => 'publish',
+        'numberposts' => -1,
+        'meta_key'    => $meta_key,
+        'meta_value'  => $meta_value
+      );
+
+      $posts = get_posts( $args );
+
+      // add categories to object
+      $outbox = array();
+      foreach ( $posts as $p ) {
+        $p->categories = array();
+
+        $cats = get_the_category( $p->ID );
+        foreach( $cats as $cat ){
+          $p->categories[] = $cat->term_id;
+        }
+        $outbox[] = $p;
+      }
+
+      if(!empty( $outbox )){
+        $this->send_notifier( $outbox );
+      }
+    }
+
+    /**
+     * Send notifier to subscribers
+     * @param  object $outbox
+     */
+    private function send_notifier( $outbox = '' ){
+      $subscribers = $this->get_subscribers();
+
+      $i = 0;
+      $emails = array();
+      foreach ($outbox as $post ) {
+          
+        // edit category value so it could be used in in_array(), we dont want a value 2 to be match with value 22
+        $post_cat_compare = array();
+        if(!empty( $post->categories )){
+          foreach ($post->categories as $cat ) {
+            $post_cat_compare[] = ':' . $cat . ':';
+          }
+        }
+
+
+        foreach( $subscribers as $subscriber ) {      
+          
+          foreach( $subscriber->categories as $categories ) {
+            
+            // add compare signs for in_array()
+            $categories = ':' . $categories . ':';
+
+            if(in_array( $categories, $post_cat_compare )){
+              $emails[$i]['subscriber_id'] = $subscriber->ID;
+              $emails[$i]['hash'] = get_post_meta( $subscriber->ID, '_stc_hash', true );
+              $emails[$i]['email'] = $subscriber->post_title;
+              $emails[$i]['post_id'] = $post->ID;
+              $emails[$i]['post'] = $post;
+              $i++; 
+            }                 
+          
+          }
+        
+        }
+      
+      }
+
+      //remove duplicates, we will just send one email to subscriber
+      $emails = array_intersect_key( $emails , array_unique( array_map('serialize' , $emails ) ) ); 
+
+      $website_name = get_bloginfo( 'name' );
+      $email_title = $this->settings['title'];      
+
+      $email_from = $this->settings['email_from'];
+      if( !is_email( $email_from ) )
+        $email_from = get_option( 'admin_email' ); // set admin email if email settings is not valid
+
+      $headers  = 'MIME-Version: 1.0' . "\r\n";
+      $headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
+      $headers .= 'From: '. $website_name.' <'.$email_from.'>' . "\r\n";
+
+      // loop through subscribers and send notice
+      foreach ($emails as $email ) {
+
+        ob_start(); // start buffering and get content
+        $this->email_html_content( $email );
+        $message = ob_get_contents();
+        ob_get_clean();
+
+        $email_subject = $email_title;
+        if( empty( $email_title ))
+          $email_subject = $email['post']->post_title;
+
+        $subject = '=?UTF-8?B?'.base64_encode( $email_subject ).'?=';
+
+        wp_mail( $email['email'], $subject, $message, $headers );
+
+      }
+
+      //update some postmeta that email is sent
+      foreach ($outbox as $post ) {
+        update_post_meta( $post->ID, '_stc_notifier_status', 'sent' );
+        update_post_meta( $post->ID, '_stc_notifier_sent_time', mysql2date( 'Y-m-d H:i:s', time() ) );
+      }
+        
+    }
+
+    /**
+     * Render html to email. 
+     * Setting limit to content as we still want the user to click and visit our site.
+     * @param  object $email
+     */    
+    private function email_html_content( $email ){
+      ?>
+      <h3><a href="<?php echo get_permalink( $email['post_id']) ?>"><?php echo $email['post']->post_title; ?></a></h3>
+      <div><?php echo apply_filters('the_content', $this->string_cut( $email['post']->post_content, 130 ) );?></div>
+      <div style="border-bottom: 1px solid #cccccc; padding-bottom: 10px;"><a href="<?php echo get_permalink( $email['post_id'] ); ?>"> <?php _e('Click here to read full story', STC_TEXTDOMAIN ); ?></a></div>
+      <div style="margin-top: 20px;"><a href="<?php echo get_bloginfo('url') . '/?stc_unsubscribe=' . $email['hash'] . '&stc_user=' . $email['email']; ?>"><?php _e('Unsubscribe me', STC_TEXTDOMAIN ); ?></a></div>
+      <?php
+    }
+
+
+    /**
+     * Cut a text string closest word on a given length.
+     * @param  string $string
+     * @param  int $max_length
+     * @return string
+     */
+    private function string_cut( $string, $max_length ){  
+
+      // remove shortcode if there is
+      $string = strip_shortcodes( $string ); 
+
+      if( strlen( $string ) > $max_length ){  
+        $string = substr( $string, 0, $max_length );  
+        $pos = strrpos( $string, ' ' );  
+          
+        if($pos === false) {  
+          return substr($string, 0, $max_length)." ... ";  
+        }  
+        return substr($string, 0, $pos)." ... ";  
+
+      }else{  
+        return $string;  
+      }  
+    }  
+
+    /**
+     * Get all subscribers with subscribed categories
+     * @return object Subscribers
+     */
+    private function get_subscribers(){
+
+      $args = array(
+        'post_type'   => 'stc',
+        'numberposts' => -1,
+        'post_status' => 'publish'
+      );
+
+      $stc = get_posts( $args );
+
+      $subscribers = array();
+      foreach ($stc as $s) {
+        $s->categories = array();
+
+        $cats = get_the_category( $s->ID );
+    
+        foreach ($cats as $cat ) {
+          $s->categories[] = $cat->term_id;
+        }
+
+        $subscribers[] = $s;
+      }
+
+      return $subscribers;
+
+    }
 
   	/**
   	 * Register custom post type for subscribers

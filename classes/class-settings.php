@@ -1,10 +1,14 @@
 <?php
-  /**
-   * 
-   * Class for the settings page
-   * @author Daniel Söderström <info@dcweb.nu>
-   * 
-   */
+/**
+ * 
+ * Class for the settings page
+ * @author Daniel Söderström <info@dcweb.nu>
+ * 
+ */
+
+// If this file is called directly, abort.
+if ( !defined( 'WPINC' ) )
+  die();
   
 if( class_exists( 'STC_Settings' ) ) {
   $stc_setting = new STC_Settings();
@@ -24,8 +28,8 @@ if( class_exists( 'STC_Settings' ) ) {
       if( is_admin() ) {    
         add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
         add_action( 'admin_init', array( $this, 'register_settings' ) );
-        add_action( 'init', array( $this, 'get_requests'), 10); // $_GET
-        add_action( 'init', array( $this, 'get_transients'), 99); // transients
+        add_action( 'init', array( $this, 'get_requests'), 999 ); // $_GET
+        add_action( 'init', array( $this, 'get_transients'), 99 ); // transients
 
       }
 
@@ -36,37 +40,27 @@ if( class_exists( 'STC_Settings' ) ) {
      * Getting $_GET requests
      */
     public function get_requests(){
-      
 
-      // running cron manually 
-      if( isset($_GET['action']) && $_GET['action']=='run-stc-cron') {
+      // Bypass scheduled event and run event manually
+      if( isset( $_GET['action'] ) && $_GET['action'] == 'stc-force-run' ){
 
         // security check
         if( !current_user_can('manage_options') ) 
-          die(__( 'You are not allowed to run cron events.', STC_TEXTDOMAIN ));
+          die(__( 'You are not allowed to run this action.', STC_TEXTDOMAIN ));
 
         // check nonce
-        check_admin_referer('stc_run_cron');
+        check_admin_referer( 'stc_force_run');
 
-        // init cron class and run cron
-        $cron = STC_Cron::get_instance();
+        $subscriber = STC_Subscribe::get_instance();
+        $subscriber->stc_send_email();
 
-        if( $cron->run_cron() ){
-          $url = admin_url( 'options-general.php?page=stc-subscribe-settings' );
-          // set transient for showing admin notice in settings
-          set_transient( 'stc_notice_id', '1', 3600 );
-          wp_redirect( $url );
-          exit;
+        // Redirect to url for settings and print notice
+        $url = admin_url( 'options-general.php?page=stc-subscribe-settings' );
         
-        }else{
-          $url = admin_url( 'options-general.php?page=stc-subscribe-settings' );
-          // set transient for showing admin notice in settings
-          set_transient( 'stc_notice_id', '0', 3600 );
-          wp_redirect( $url );
-          exit;
-
-        }
-
+        // set transient for showing admin notice in settings
+        set_transient( 'stc_notice_id', '1', 3600 );
+        wp_redirect( $url );
+        exit;        
 
       }
  
@@ -127,20 +121,20 @@ if( class_exists( 'STC_Settings' ) ) {
       
       if( isset( $_POST['action'] ) && $_POST['action'] == 'export' ){
           
-          // listen for filter by categories
-          if( isset( $_POST['in_categories'] ) && !empty( $_POST['in_categories'] ) ){
-            $this->export_in_categories = $_POST['in_categories']; 
-          }
-          $this->export_to_excel();
+        // listen for filter by categories
+        if( isset( $_POST['in_categories'] ) && !empty( $_POST['in_categories'] ) ){
+          $this->export_in_categories = $_POST['in_categories']; 
+        }
+        $this->export_to_excel();
+      
       }
       
-      //$this->export_to_excel();
       add_options_page(
-          __( 'Subscribe to Category', STC_TEXTDOMAIN ), 
-          __( 'Subscribe', STC_TEXTDOMAIN ), 
-          'manage_options', 
-          'stc-subscribe-settings', 
-          array( $this, 'create_admin_page' )
+        __( 'Subscribe to Category', STC_TEXTDOMAIN ), 
+        __( 'Subscribe', STC_TEXTDOMAIN ), 
+        'manage_options', 
+        'stc-subscribe-settings', 
+        array( $this, 'create_admin_page' )
       );
 
     }
@@ -163,20 +157,15 @@ if( class_exists( 'STC_Settings' ) ) {
         <table class="widefat">
           <tbody>
             <tr>
-              <td class="desc"><strong><?php _e( 'Schedule: ', STC_TEXTDOMAIN ); ?></strong> <?php printf( __('E-mail is scheduled to be sent once every hour. Next run is going to be <strong>%s</strong>', STC_TEXTDOMAIN ), $next_run ); ?></td>
+              <td class="desc"><strong><?php _e( 'Schedule: ', STC_TEXTDOMAIN ); ?></strong> <?php _e('E-mail is scheduled to be sent once every hour.', STC_TEXTDOMAIN ); ?></td>
               <td class="desc"></td>
-              <td class="desc textright"><a href="<?php echo wp_nonce_url('options-general.php?page=stc-subscribe-settings&action=run-stc-cron', 'stc_run_cron');?>"> <?php _e( 'Click here to run scheduled event right now', STC_TEXTDOMAIN ); ?></a></td>
+              <td class="desc textright"><a href="<?php echo wp_nonce_url('options-general.php?page=stc-subscribe-settings&action=stc-force-run', 'stc_force_run');?>"> <?php _e( 'Click here to run this action right now', STC_TEXTDOMAIN ); ?></a></td>
+            </tr>
+            <tr>
+              <td class="desc" colspan="3"><?php printf( __('Next run is going to be <strong>%s</strong> and will include %s posts.', STC_TEXTDOMAIN ), $next_run, $this->get_posts_in_que() ); ?></td>
             </tr>
           </tbody>
         </table>
-
-        <div class="panel">    
-        
-
-    
-
-        
-        </div>
 
         <form method="post" action="options.php">
         <?php
@@ -184,6 +173,7 @@ if( class_exists( 'STC_Settings' ) ) {
             settings_fields( 'stc_option_group' );   
             do_settings_sections( 'stc-subscribe-settings' );
             do_settings_sections( 'stc-style-settings' );
+            do_settings_sections( 'stc-deactivation-settings' );
             submit_button(); 
         ?>
         </form>
@@ -193,6 +183,28 @@ if( class_exists( 'STC_Settings' ) ) {
       <?php
     }
 
+    /**
+     * Get current posts in que to be sent
+     * @return int sum of posts
+     */
+    private function get_posts_in_que(){
+      
+      // get posts with a post meta value in outbox
+      $meta_key = '_stc_notifier_status';
+      $meta_value = 'outbox';
+
+      $args = array(
+        'post_type'   => 'post',
+        'post_status' => 'publish',
+        'numberposts' => -1,
+        'meta_key'    => $meta_key,
+        'meta_value'  => $meta_value
+      );
+
+      $posts = get_posts( $args );
+
+      return count( $posts );
+    }
 
     /**
      * Returns the time in seconds until a specified cron job is scheduled.
@@ -222,6 +234,23 @@ if( class_exists( 'STC_Settings' ) ) {
             'stc-subscribe-settings' // Page
         );  
 
+        add_settings_field(
+            'stc_email_from',
+            __( 'E-mail from: ', STC_TEXTDOMAIN ),
+            array( $this, 'stc_email_from_callback' ), // Callback
+            'stc-subscribe-settings', // Page
+            'setting_email_id' // Section           
+        );
+
+        add_settings_field(
+            'stc_title',
+            __( 'Email subject: ', STC_TEXTDOMAIN ),
+            array( $this, 'stc_title_callback' ), // Callback
+            'stc-subscribe-settings', // Page
+            'setting_email_id' // Section           
+        );
+
+
         // Styleing settings
         add_settings_section(
             'setting_style_id', // ID
@@ -239,21 +268,22 @@ if( class_exists( 'STC_Settings' ) ) {
         );
 
 
-        add_settings_field(
-            'stc_email_from',
-            __( 'E-mail from: ', STC_TEXTDOMAIN ),
-            array( $this, 'stc_email_from_callback' ), // Callback
-            'stc-subscribe-settings', // Page
-            'setting_email_id' // Section           
-        );
+        // Deactivation settings
+        add_settings_section(
+            'setting_deactivation_id', // ID
+            __( 'On plugin deactivation', STC_TEXTDOMAIN ), // Title
+            array( $this, 'section_deactivation_info' ), // Callback
+            'stc-deactivation-settings' // Page
+        );          
 
         add_settings_field(
-            'stc_title',
-            __( 'Email subject: ', STC_TEXTDOMAIN ),
-            array( $this, 'stc_title_callback' ), // Callback
-            'stc-subscribe-settings', // Page
-            'setting_email_id' // Section           
-        );
+            'stc_remove_subscribers',
+            __( 'Subscribers: ', STC_TEXTDOMAIN ),
+            array( $this, 'stc_remove_subscribers_callback' ), // Callback
+            'stc-deactivation-settings', // Page
+            'setting_deactivation_id' // Section           
+        );        
+
 
         register_setting(
           'stc_option_group', // Option group
@@ -261,6 +291,12 @@ if( class_exists( 'STC_Settings' ) ) {
           array( $this, 'input_validate_sanitize' ) // Callback function for validate and sanitize input values
         );
 
+    }
+
+    public function section_deactivation_info(){
+      ?>
+      <p><?php _e('The plugin will remove all data in database created by this plugin but there is an option regarding subscribers', STC_TEXTDOMAIN ); ?></p>
+      <?php
     }
 
     /**
@@ -290,10 +326,12 @@ if( class_exists( 'STC_Settings' ) ) {
           $output['exclude_css'] = $input['exclude_css'];
         }
 
+        if( isset( $input['deactivation_remove_subscribers'] ) ){
+          $output['deactivation_remove_subscribers'] = $input['deactivation_remove_subscribers'];
+        }
+
         return $output;
     }
-
-
 
     /** 
      * Printing section text
@@ -326,17 +364,36 @@ if( class_exists( 'STC_Settings' ) ) {
     /** 
      * Get the settings option array and print one of its values
      */
-    public function stc_css_callback() { ?>
+    public function stc_css_callback() { 
+      $options['exclude_css'] = '';
+      
+      if( isset( $this->options['exclude_css'] ) )
+        $options['exclude_css'] = $this->options['exclude_css'];
+      ?>
 
-      <label for="exclude_css"><input type="checkbox" value="1" id="exclude_css" name="stc_settings[exclude_css]" <?php checked( '1', $this->options['exclude_css'] ); ?>><?php _e('Exclude custom CSS', STC_TEXTDOMAIN ); ?></label>
+      <label for="exclude_css"><input type="checkbox" value="1" id="exclude_css" name="stc_settings[exclude_css]" <?php checked( '1', $options['exclude_css'] ); ?>><?php _e('Exclude custom CSS', STC_TEXTDOMAIN ); ?></label>
       <p class="description"><?php _e('Check this option if your theme supports Bootstrap framework or if you want to place your own CSS for Subscribe to Category in your theme.', STC_TEXTDOMAIN ); ?></p>
-
-
     <?php
     }
 
+    /** 
+     * Get the settings option array and print one of its values
+     */
+    public function stc_remove_subscribers_callback() { 
+      $options['deactivation_remove_subscribers'] = '';
+      
+      if( isset( $this->options['deactivation_remove_subscribers'] ) )
+        $options['deactivation_remove_subscribers'] = $this->options['deactivation_remove_subscribers'];
+  
+      ?>
 
+      <label for="deactivation_remove_subscribers"><input type="checkbox" value="1" id="deactivation_remove_subscribers" name="stc_settings[deactivation_remove_subscribers]" <?php checked( '1', $options['deactivation_remove_subscribers'] ); ?>><?php _e('Delete all subscribers on deactivation', STC_TEXTDOMAIN ); ?></label>
+    <?php
+    }        
 
+    /**
+     * Form for filtering categories on export to excel
+     */
     public function export_to_excel_form(){
       $categories = get_categories( array( 'hide_empty' => false ) ); 
       ?>
@@ -366,49 +423,49 @@ if( class_exists( 'STC_Settings' ) ) {
     }
 
 
-  /**
-   * Export method for excel
-   */
-  public function export_to_excel(){
+    /**
+     * Export method for excel
+     */
+    public function export_to_excel(){
 
-    $args = array(
-      'post_type'     => 'stc',
-      'post_status'   => 'publish',
-      'category__in'  => $this->export_in_categories // Empty value returns all categories
-    );
+      $args = array(
+        'post_type'     => 'stc',
+        'post_status'   => 'publish',
+        'category__in'  => $this->export_in_categories // Empty value returns all categories
+      );
 
-    $posts = get_posts( $args );
+      $posts = get_posts( $args );
 
-    // get category names for filtered categories to print out in excel file, if there is a filter...
-    if(!empty( $this->export_in_categories)){
-      
-      foreach ( $this->export_in_categories as $item ) {
-        $cats = get_term( $item, 'category' );
-        $cats_name .= $cats->name.', ';
+      // get category names for filtered categories to print out in excel file, if there is a filter...
+      if(!empty( $this->export_in_categories)){
+        
+        foreach ( $this->export_in_categories as $item ) {
+          $cats = get_term( $item, 'category' );
+          $cats_name .= $cats->name.', ';
+        }
+        // remove last commasign in str
+        $in_category_name = substr( $cats_name, 0, -2 );
       }
-      // remove last commasign in str
-      $in_category_name = substr( $cats_name, 0, -2 );
-    }
 
-    $i = 0;
-    $export = array();
-    foreach ($posts as $p) {
-      
-      $cats = get_the_category( $p->ID ); 
-      foreach ($cats as $c) {
-        $c_name .= $c->name . ', ';
+      $i = 0;
+      $export = array();
+      foreach ($posts as $p) {
+        
+        $cats = get_the_category( $p->ID ); 
+        foreach ($cats as $c) {
+          $c_name .= $c->name . ', ';
+        }
+        $in_categories = substr( $c_name, 0, -2);
+        $c_name = false; // unset variable
+
+        $export[$i]['id'] = $p->ID;
+        $export[$i]['email'] = $p->post_title;
+        $export[$i]['user_categories'] = $in_categories;
+        $export[$i]['subscription_date'] = $p->post_date;
+        
+        $i++;
       }
-      $in_categories = substr( $c_name, 0, -2);
-      $c_name = false; // unset variable
-
-      $export[$i]['id'] = $p->ID;
-      $export[$i]['email'] = $p->post_title;
-      $export[$i]['user_categories'] = $in_categories;
-      $export[$i]['subscription_date'] = $p->post_date;
       
-      $i++;
-    }
-    
       // filename for download 
       $time = date('Ymd_His'); 
       $filename = STC_SLUG . '_' . $time . '.xls';
@@ -417,9 +474,7 @@ if( class_exists( 'STC_Settings' ) ) {
       header("Content-Type:   application/vnd.ms-excel; ");
       header("Content-type:   application/x-msexcel; ");
 
-
       $flag = false; 
-
       // print out filtered categories if there is
       if(!empty( $in_category_name ))
         echo "\r\n", utf8_decode( __('Filtered by: ', STC_TEXTDOMAIN ) ) . utf8_decode( $in_category_name ); 
@@ -438,17 +493,15 @@ if( class_exists( 'STC_Settings' ) ) {
       exit;
 
     }
-
-     
-     public function clean_data_for_excel( &$str ) { 
+      
+    /**
+     * Method for cleaning data to excel
+     */
+    public function clean_data_for_excel( &$str ) { 
       $str = iconv('UTF-8', 'ISO-8859-1', $str );
       $str = preg_replace("/\t/", "\\t", $str ); 
       $str = preg_replace("/\r?\n/", "\\n", $str ); 
     } 
-
-
-
-
 
   }
 

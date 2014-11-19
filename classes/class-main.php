@@ -1,13 +1,19 @@
 <?php
 /**
+ * 
  * STC Main class
  * @author Daniel Söderström <info@dcweb.nu>
+ * 
  */
+
+// If this file is called directly, abort.
+if ( !defined( 'WPINC' ) )
+  die();
 
 class STC_Main {
 
-	protected $plugin_slug = 'stc';
 	protected static $instance = null;
+	protected $plugin_slug = 'stc';
 	private $options = array();
 
 	/**
@@ -21,49 +27,10 @@ class STC_Main {
 
 		// Load plugin text domain
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
-		
-		// Activate plugin when new blog is added
-		//add_action( 'wpmu_new_blog', array( $this, 'activate_new_site' ) );
 
 		// load public css
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
-	
-		// load public scripts
-		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
-	}
-
-	/**
-	 * Store options to an array
-	 */
-	private function set_options(){
-		$this->options = get_option( 'stc_settings');
-	}
-
-	/**
-	 * Create instance of classes
-	 */
-	public function create_instance(){
-
-    if( class_exists( 'STC_Settings' ) ) {
-      $stc_setting = new STC_Settings();
-    }
-
-    if( class_exists( 'STC_Cron' ) ) {
-      $stc_cron = new STC_Cron();
-    }
-
-    if( class_exists( 'STC_Subscribe' ) ) {
-      $stc_subscribe = new STC_Subscribe();
-    }
-
-	}
-
-	/**
-	 * Return the plugin slug.
-	 */
-	public function get_plugin_slug() {
-		return $this->plugin_slug;
 	}
 
 	/**
@@ -80,11 +47,24 @@ class STC_Main {
 	}
 
 	/**
+	 * Store options to an array
+	 */
+	private function set_options(){
+		$this->options = get_option( 'stc_settings');
+	}
+
+	/**
+	 * Return the plugin slug.
+	 */
+	public function get_plugin_slug() {
+		return $this->plugin_slug;
+	}
+
+	/**
 	 * Fired when the plugin is activated.
 	 */
 	public static function activate( $network_wide ) {
 
-		
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
 
 			if ( $network_wide  ) {
@@ -115,7 +95,6 @@ class STC_Main {
 	 */
 	public static function deactivate( $network_wide ) {
 
-		
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
 
 			if ( $network_wide ) {
@@ -162,7 +141,37 @@ class STC_Main {
 	 * - delete hook
 	 */
 	private static function single_deactivate() {
+    global $wpdb;
 
+    // get current options
+    $options = get_option('stc_settings');
+
+
+    // remove post meta for posts
+    $meta_data = array(
+      '_stc_notifier_sent_time',
+      '_stc_notifier_status'
+    );
+
+    foreach ($meta_data as $meta) {
+      $wpdb->query( 
+        $wpdb->prepare( "DELETE FROM $wpdb->postmeta WHERE meta_key = %s", $meta ) 
+      );      
+    }
+		
+    // remove posts in post type stc 
+    if(isset( $options['deactivation_remove_subscribers'] ) && $options['deactivation_remove_subscribers'] == 1 ) {
+	    $args = array( 'post_type' => 'stc' );
+	    $posts = get_posts( $args );
+
+	    if(!empty( $posts )){
+	      foreach ($posts as $post ) {
+	        wp_delete_post( $post->ID, true );
+	      }
+	    }
+    }
+    	
+		// delete data saved for options
 		delete_option( 'stc_settings' );
 
 		// kill hook for scheduled event
@@ -174,40 +183,29 @@ class STC_Main {
 	 * Get all blog ids of blogs
 	 */
 	private static function get_blog_ids() {
-
 		global $wpdb;
 
 		// get an array of blog ids
-		$sql = "SELECT blog_id FROM $wpdb->blogs
-			WHERE archived = '0' AND spam = '0'
-			AND deleted = '0'";
-
+		$sql = "SELECT blog_id FROM $wpdb->blogs WHERE archived = '0' AND spam = '0' AND deleted = '0'";
 		return $wpdb->get_col( $sql );
 
 	}
 
 	/**
-	 * Load the plugin text domain for translation.
+	 * Load the plugin text domain for translation
 	 */
 	public function load_plugin_textdomain() {
 		load_plugin_textdomain( STC_TEXTDOMAIN, false, basename( plugin_dir_path( dirname( __FILE__ ) ) ) . '/languages/' ); 
 	}
 
 	/**
-	 * Register and enqueue public style sheet.
+	 * Register and enqueue public style sheet
 	 */
 	public function enqueue_styles() {
 		$options = $this->options;
 		
 		if( isset($options['exclude_css']) && $options['exclude_css'] == false ) // check options for css
 			wp_enqueue_style( 'stc-style', STC_PLUGIN_URL . '/css/stc-style.css', array() );
-	}
-
-	/**
-	 * Register and enqueues public JavaScript files.
-	 */
-	public function enqueue_scripts() {
-		wp_enqueue_script( 'stc-script', STC_PLUGIN_URL . '/js/stc-scripts.js', array( 'jquery' ) );
 	}
 
 }
