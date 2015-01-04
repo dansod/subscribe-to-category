@@ -24,6 +24,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
     private $settings = array();
     private $post_type = 'stc';
     private $sleep_flag = 25;
+    private $show_all_categories = true;
 
     /**
      * Constructor
@@ -54,9 +55,11 @@ if( class_exists( 'STC_Subscribe' ) ) {
      *
      * @since  1.0.0 
   	 * 
-     * @return [type] [description]
   	 */
   	private function init(){
+
+      // save settings to array
+      $this->settings = get_option( 'stc_settings' );
 
       add_action( 'init', array( $this, 'register_post_type'), 99 );
       add_action( 'create_category', array( $this, 'update_subscriber_categories') );
@@ -73,10 +76,39 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
       add_action( 'stc_schedule_email', array( $this, 'stc_send_email' ) );
 
-      // save settings to array
-      $this->settings = get_option( 'stc_settings' );
+      // adding checkbox to publish meta box if activated
+      if( $this->settings['resend_option'] == 1 )
+        add_action( 'post_submitbox_misc_actions', array( $this, 'resend_post_option' ) );
 
   	}
+
+    /**
+     * Adding checkbox to publish meta box with an option to re-send a post 
+     *
+     * @since 1.2.0
+     * 
+     */
+    public function resend_post_option(){
+      global $post;
+      $stc_status = get_post_meta( $post->ID, '_stc_notifier_status', true );
+
+      // We wont show re-send option on a post that hasn´t been sent
+      if( $stc_status != 'sent' )
+        return false;
+
+      $time_in_seconds_i18n = strtotime( date_i18n( 'Y-m-d H:i:s' ) ) + STC_Settings::get_next_cron_time( 'stc_schedule_email' );
+      $next_run = gmdate( 'Y-m-d H:i:s', $time_in_seconds_i18n ); 
+
+      ?>
+        <div class="misc-pub-section stc-section">
+          <span class="dashicons dashicons-groups"></span> <label><?php _e('Re-send post to subscribers', STC_TEXTDOMAIN ); ?> <input id="stc-resend" type="checkbox" name="stc_resend"></label>
+          <div id="stc-resend-info" style="display:none;">
+            <p><i><?php printf( __( 'This post update will be re-sent to subscribers %s', STC_TEXTDOMAIN ), $next_run ); ?></i></p>
+          </div>
+        </div>
+      <?php
+    }
+
 
     /**
      * Adding a newly created category to subscribers who subscribes to all categories
@@ -211,10 +243,14 @@ if( class_exists( 'STC_Subscribe' ) ) {
       // bail if not the correct post type
       if( $post->post_type != 'post' )
         return false;
-
-      // We wont send email notice if a post i updated
+        
+      // Send email notice if a post is published for the first time or if manually triggered to be re-sent.
       if( $new_status == 'new' ){
         update_post_meta( $post->ID, '_stc_notifier_status', 'outbox' ); // updating post meta
+
+      }elseif( isset( $_POST['stc_resend'] ) && $_POST['stc_resend'] == 'on' ){
+        update_post_meta( $post->ID, '_stc_notifier_status', 'outbox' ); // updating post meta
+
       }
       
     }
@@ -542,11 +578,11 @@ if( class_exists( 'STC_Subscribe' ) ) {
      *
      * @todo add some filter 
   	 */
-  	public function stc_subscribe_render(){
+  	public function stc_subscribe_render( $atts ){
 
       //start buffering
   		ob_start();
-  		$this->html_render();
+  		$this->html_render( $atts );
   		$form = ob_get_contents();
   		ob_get_clean();
   		//$form = apply_filters( 'stc_form', $form, 'teststring' );
@@ -599,6 +635,68 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
     }
 
+    /**
+     * Filter to show categories by attribute 'category_in' in shortcode
+     * 
+     * @param  array  $cats_all All categories
+     * @param  string $cats_in  Categories entered in shortcode
+     * 
+     * @since 1.2.0
+     * 
+     * @return array            Array with categories to show
+     */
+    private function filter_categories_in( $cats_all = '', $cats_in = '' ){
+
+      if(empty( $cats_all ))
+        return false;
+
+      $cats_in = explode(',', str_replace(', ', ',', $cats_in ) );
+
+      $filtered_cats = array();
+      foreach( $cats_in as $cat_in ){
+        foreach ($cats_all as $cat ) {
+          if( mb_strtolower( $cat_in ) == mb_strtolower( $cat->name ) )
+            $filtered_cats[] = $cat;
+        }
+      }
+
+      return $filtered_cats;
+
+
+    }
+
+    /**
+     * Filter to exclude categories by attribute 'category_not_in' in shortcode
+     * 
+     * @param  array  $cats_all    All categories
+     * @param  string $cats_not_in Categories entered in shortcode
+     *
+     * @since 1.2.0
+     * 
+     * @return array                Array with categories to show
+     */
+    private function filter_categories_not_in( $cats_all = '', $cats_not_in = '' ){
+     
+      if(empty( $cats_all ))
+        return false;
+
+      $cats_not_in = explode(',', str_replace(', ', ',', $cats_not_in ) );        
+
+        $filtered_cats = $cats_all;
+          
+          foreach ($cats_all as $key => $cat ) {
+
+            foreach( $cats_not_in as $cat_not_in ){
+              if( mb_strtolower( $cat_not_in ) == mb_strtolower( $cat->name ) )
+                unset($filtered_cats[$key]);
+            }
+          
+        }
+
+        return $filtered_cats;
+ 
+    }
+
   	/**
   	 * Html for subscribe form
      *
@@ -606,16 +704,25 @@ if( class_exists( 'STC_Subscribe' ) ) {
      *  
   	 * @return [type] [description]
   	 */
-  	public function html_render(){
+  	public function html_render( $atts = false ){
+
+      extract( shortcode_atts( array(
+        'category_in' => false,
+        'category_not_in' => false,
+      ), $atts ));
 
       // add hook when we have a request to render html
   		add_action('wp_footer', array( $this, 'add_script_to_footer' ), 20);
-  		
-      
+  		      
       // getting all categories
       $args = array( 'hide_empty' => 0 );
   		$cats = get_categories( $args );
 
+      if( !empty( $category_in ) ){
+        $cats = $this->filter_categories_in( $cats, $category_in );
+      }elseif( !empty( $category_not_in ) ){
+        $cats = $this->filter_categories_not_in( $cats, $category_not_in );
+      }
 
       // if error store email address in field value so user dont need to add it again
   		if(!empty( $this->error)){
@@ -659,13 +766,16 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
           <div class="stc-categories"<?php echo $post_stc_unsubscribe == 1 ? ' style="display:none;"' : NULL; ?>>
             <h3><?php _e('Categories', STC_TEXTDOMAIN ); ?></h3>
+            <?php if( $this->show_all_categories === true ) : ?>
             <div class="checkbox">
               <label>
                 <input type="checkbox" id="stc-all-categories" name="stc_all_categories" value="1">
                 <?php _e('All categories', STC_TEXTDOMAIN ); ?>
               </label>
             </div>
+            <?php endif; ?>
             <div class="stc-categories-checkboxes">
+            <?php if(! empty( $cats ) ) : ?>
     				<?php foreach ($cats as $cat ) : ?>
             <div class="checkbox">
       				<label>
@@ -674,6 +784,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
       				</label>
             </div>
   				  <?php endforeach; ?>
+          <?php endif; ?>
           </div><!-- .stc-categories-checkboxes -->
           </div><!-- .stc-categories -->
 
