@@ -26,8 +26,8 @@ The following settings and features are available for the administrator in curre
 *   Run the cron job manually so it will fire immediately
 *   Theres a note when next scheduled event for sending e-mails to subscribers is running.
 *   Options for leave no trace - deletes post meta and subscribers created by this plugin.
-* 	Option for re-send a post on update that has already been sent.
-* 	Shortcode attributes for showing and hiding some categories from subscribe form. 
+*   Option for re-send a post on update that has already been sent.
+*   Shortcode attributes for showing and hiding some categories from subscribe form. 
 
 
 = What Translations are included? =
