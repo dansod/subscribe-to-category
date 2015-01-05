@@ -212,14 +212,14 @@ if( class_exists( 'STC_Settings' ) ) {
         // Resend settings
         add_settings_section(
             'setting_resend_id', // ID
-            __( 'Re-send option', STC_TEXTDOMAIN ), // Title
+            __( 'Resend post on update', STC_TEXTDOMAIN ), // Title
             '', //array( $this, 'print_section_info' ), // Callback
             'stc-resend-settings' // Page
         );  
 
         add_settings_field(
             'stc_resend',
-            __( 'Re-send option:', STC_TEXTDOMAIN ),
+            __( 'Resend:', STC_TEXTDOMAIN ),
             array( $this, 'stc_resend_callback' ), // Callback
             'stc-resend-settings', // Page
             'setting_resend_id' // Section           
@@ -373,8 +373,8 @@ if( class_exists( 'STC_Settings' ) ) {
         $options['resend_option'] = $this->options['resend_option'];
       ?>
 
-      <label for="resend_option"><input type="checkbox" value="1" id="resend_option" name="stc_settings[resend_option]" <?php checked( '1', $options['resend_option'] ); ?>><?php _e('Enable re-send option', STC_TEXTDOMAIN ); ?></label>
-      <p class="description"><?php _e('Gives an option on edit post (in the publish panel) to re-send a post on update.', STC_TEXTDOMAIN ); ?></p>
+      <label for="resend_option"><input type="checkbox" value="1" id="resend_option" name="stc_settings[resend_option]" <?php checked( '1', $options['resend_option'] ); ?>><?php _e('Enable resend post option', STC_TEXTDOMAIN ); ?></label>
+      <p class="description"><?php _e('Gives an option on edit post (in the publish panel) to resend a post on update.', STC_TEXTDOMAIN ); ?></p>
     <?php
     }    
 

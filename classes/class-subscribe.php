@@ -83,7 +83,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
   	}
 
     /**
-     * Adding checkbox to publish meta box with an option to re-send a post 
+     * Adding checkbox to publish meta box with an option to resend a post 
      *
      * @since 1.2.0
      * 
@@ -92,7 +92,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
       global $post;
       $stc_status = get_post_meta( $post->ID, '_stc_notifier_status', true );
 
-      // We wont show re-send option on a post that hasn´t been sent
+      // We wont show resend option on a post that hasn´t been sent
       if( $stc_status != 'sent' )
         return false;
 
@@ -101,7 +101,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
       ?>
         <div class="misc-pub-section stc-section">
-          <span class="dashicons dashicons-groups"></span> <label><?php _e('Re-send post to subscribers', STC_TEXTDOMAIN ); ?> <input id="stc-resend" type="checkbox" name="stc_resend"></label>
+          <span class="dashicons dashicons-groups"></span> <label><?php _e('Resend post to subscribers', STC_TEXTDOMAIN ); ?> <input id="stc-resend" type="checkbox" name="stc_resend"></label>
           <div id="stc-resend-info" style="display:none;">
             <p><i><?php printf( __( 'This post update will be re-sent to subscribers %s', STC_TEXTDOMAIN ), $next_run ); ?></i></p>
           </div>
