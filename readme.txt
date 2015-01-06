@@ -60,7 +60,7 @@ Therefore a suggested interval for your server cron could be once every 5 minute
 1. Settings page.
 2. With Bootstrap framework.
 3. Without Bootstrap framework, override and add your own css.
-
+4. When resend post is enabled in settings there is a new option available when editing a post.
 
 == Changelog ==
 

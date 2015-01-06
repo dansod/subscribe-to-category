@@ -57,7 +57,6 @@ if( class_exists( 'STC_Subscribe' ) ) {
   	 * 
   	 */
   	private function init(){
-
       // save settings to array
       $this->settings = get_option( 'stc_settings' );
 
@@ -72,7 +71,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
 
   		add_shortcode( 'stc-subscribe', array( $this, 'stc_subscribe_render' ) );
-      add_action( 'transition_post_status', array( $this, 'new_post_submit' ), 10, 3 );
+      add_action( 'save_post', array( $this, 'save_post' ) );
 
       add_action( 'stc_schedule_email', array( $this, 'stc_send_email' ) );
 
@@ -230,29 +229,46 @@ if( class_exists( 'STC_Subscribe' ) ) {
     }
 
     /**
-     * Listen for every new post and update post meta if post type 'post'
+     * Save post hook to update post meta 
      *
-     * @since  1.0.0
+     * @since 1.2.0
      * 
-     * @param  string $old_status 
-     * @param  string $new_status 
-     * @param  object $post
+     * @param  int $post_id     Post ID
      */
-    public function new_post_submit( $old_status, $new_status, $post ){
+    public function save_post( $post_id ) {
 
-      // bail if not the correct post type
-      if( $post->post_type != 'post' )
+      // If this is just a revision, exit
+      if ( wp_is_post_revision( $post_id ) )
         return false;
+
+      // exit for bulk actions and auto-drafts
+      if(empty( $_POST )) 
+        return false;
+
+      // exit if not post type post
+      if( $_POST['post_type'] != 'post' )
+        return false;
+
+      // exit if we're doing an auto save  
+      if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) 
+        return false; 
+
+      // if our current user can't edit this post, bail  
+      if( !current_user_can( 'edit_post' ) ) 
+        return false;  
+
+      $stc_status = get_post_meta( $post_id, '_stc_notifier_status', true );
+
+      if(empty( $stc_status )){
+        update_post_meta( $post_id, '_stc_notifier_status', 'outbox' ); // updating post meta
+      }else{
+
+        if( isset( $_POST['stc_resend'] ) && $_POST['stc_resend'] == 'on' ) {
+          update_post_meta( $post_id, '_stc_notifier_status', 'outbox' ); // updating post meta
+        }
         
-      // Send email notice if a post is published for the first time or if manually triggered to be re-sent.
-      if( $new_status == 'new' ){
-        update_post_meta( $post->ID, '_stc_notifier_status', 'outbox' ); // updating post meta
-
-      }elseif( isset( $_POST['stc_resend'] ) && $_POST['stc_resend'] == 'on' ){
-        update_post_meta( $post->ID, '_stc_notifier_status', 'outbox' ); // updating post meta
-
       }
-      
+
     }
 
 
@@ -913,6 +929,10 @@ if( class_exists( 'STC_Subscribe' ) ) {
         if( empty( $email_title ))
           $email_subject = $email['post']->post_title;
 
+        // add updated to title if its an update for post
+        if( $this->is_stc_resend( $email['post_id'] ) )
+          $email_subject = __('Update | ', STC_TEXTDOMAIN ) . $email_subject;
+
         $subject = '=?UTF-8?B?'.base64_encode( $email_subject ).'?=';
 
         wp_mail( $email['email'], $subject, $message, $headers );
@@ -930,9 +950,29 @@ if( class_exists( 'STC_Subscribe' ) ) {
       //update some postmeta that email is sent
       foreach ($outbox as $post ) {
         update_post_meta( $post->ID, '_stc_notifier_status', 'sent' );
-        update_post_meta( $post->ID, '_stc_notifier_sent_time', mysql2date( 'Y-m-d H:i:s', time() ) );
+        update_post_meta( $post->ID, '_stc_notifier_sent_time', date('Y-m-d H:i:s', current_time('timestamp') ) );
       }
         
+    }
+
+    /**
+     * Function to check if a post has been sent before
+     *
+     * @since 1.2.0
+     * 
+     * @param  int  $post_id    Post ID
+     * 
+     * @return boolean          True or false
+     */
+    private function is_stc_resend( $post_id = '' ){
+
+      $stc_status = get_post_meta( $post_id, '_stc_notifier_sent_time', true );
+
+      if(!empty( $stc_status ))
+        return true;
+
+      return false;
+
     }
 
     /**
