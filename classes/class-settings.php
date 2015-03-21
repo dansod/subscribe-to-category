@@ -164,7 +164,7 @@ if( class_exists( 'STC_Settings' ) ) {
      *
      * @since  1.0.0
     */
-    public function get_next_cron_time( $cron_name ){
+    public static function get_next_cron_time( $cron_name ){
 
       foreach( _get_cron_array() as $timestamp => $crons ){
 
@@ -442,7 +442,7 @@ if( class_exists( 'STC_Settings' ) ) {
         </tbody>
       </table>
       <input type="hidden" value="export" name="action">
-      <input type="submit" value="Export to Excel" class="button button-primary" id="submit" name="">
+      <input type="submit" value="<?php _e( 'Export to excel', STC_TEXTDOMAIN ); ?>" class="button button-primary" id="submit" name="">
       </form>
       
       <?php

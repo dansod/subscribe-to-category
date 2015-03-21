@@ -238,6 +238,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
     public function save_post( $post_id ) {
 
       // If this is just a revision, exit
+
       if ( wp_is_post_revision( $post_id ) )
         return false;
 
@@ -246,7 +247,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
         return false;
 
       // exit if not post type post
-      if( $_POST['post_type'] != 'post' )
+      if( isset( $_POST['post_type'] ) && $_POST['post_type'] != 'post' )
         return false;
 
       // exit if we're doing an auto save  
@@ -254,7 +255,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
         return false; 
 
       // if our current user can't edit this post, bail  
-      if( !current_user_can( 'edit_post' ) ) 
+      if( !current_user_can( 'edit_post', $post_id ) ) 
         return false;  
 
       $stc_status = get_post_meta( $post_id, '_stc_notifier_status', true );
@@ -938,7 +939,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
         wp_mail( $email['email'], $subject, $message, $headers );
 
         // sleep 2 seconds once every 25 email to prevent blacklisting
-        if( $i == $sleep_flag ){
+        if( $i == $this->sleep_flag ){
           sleep(2); // sleep for two seconds, then proceed
           $i = 1; // reset loop counter
         }
