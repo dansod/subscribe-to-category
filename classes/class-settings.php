@@ -95,7 +95,7 @@ if( class_exists( 'STC_Settings' ) ) {
 
       // Set class property
       $this->options = get_option( 'stc_settings' );
-      $time_in_seconds_i18n = strtotime( date_i18n( 'Y-m-d H:i:s' ) ) + $this->get_next_cron_time( 'stc_schedule_email' );
+      $time_in_seconds_i18n = strtotime( date_i18n( 'Y-m-d H:i:s' ) ) + self::get_next_cron_time( 'stc_schedule_email' );
       $next_run = gmdate( 'Y-m-d H:i:s', $time_in_seconds_i18n ); 
       ?>
       <div class="wrap">
@@ -164,7 +164,7 @@ if( class_exists( 'STC_Settings' ) ) {
      *
      * @since  1.0.0
     */
-    public function get_next_cron_time( $cron_name ){
+    public static function get_next_cron_time( $cron_name ){
 
       foreach( _get_cron_array() as $timestamp => $crons ){
 
