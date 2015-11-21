@@ -76,7 +76,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
       add_action( 'stc_schedule_email', array( $this, 'stc_send_email' ) );
 
       // adding checkbox to publish meta box if activated
-      if( $this->settings['resend_option'] == 1 )
+      if( isset( $this->settings['resend_option'] ) && $this->settings['resend_option'] == 1 )
         add_action( 'post_submitbox_misc_actions', array( $this, 'resend_post_option' ) );
 
   	}
@@ -238,12 +238,15 @@ if( class_exists( 'STC_Subscribe' ) ) {
     public function save_post( $post_id ) {
 
       // If this is just a revision, exit
-
       if ( wp_is_post_revision( $post_id ) )
         return false;
 
       // exit for bulk actions and auto-drafts
       if(empty( $_POST )) 
+        return false;
+
+      // only trigger this from admin
+      if( !isset( $_POST['post_type'] ) )
         return false;
 
       // exit if not post type post
@@ -503,7 +506,10 @@ if( class_exists( 'STC_Subscribe' ) ) {
         return false;
 
       // only trigger this from admin
-      if( $_POST['post_type'] != 'stc' )
+      if( !isset( $_POST['post_type'] ) )
+        return false;
+
+      if( isset( $_POST['post_type'] ) && $_POST['post_type'] != 'stc' )
         return false;
 
       // Bail if we're doing an auto save  
@@ -511,19 +517,22 @@ if( class_exists( 'STC_Subscribe' ) ) {
         return false; 
 
       // if our current user can't edit this post, bail  
-      if( !current_user_can( 'edit_post' ) ) 
+      if( !current_user_can( 'edit_post', $post_id ) ) 
         return false;  
 
       // get categories to for counting and comparing to user categories
       $categories = get_categories( array('hide_empty' => false ));
       $sum_of_categories = count( $categories );
-      $sum_of_post_categories = count( $_POST['post_category'] ) - 1; // wp sets a dummy item in post_category, therefore -1
 
+      if(isset( $_POST['post_category'] ) )
+        $sum_of_post_categories = count( $_POST['post_category'] ) - 1; // wp sets a dummy item in post_category, therefore -1
 
       // sanitize input
-      $email = sanitize_email( $_POST['post_title'] );
+      if(isset( $_POST['post_title'] ) )
+        $email = sanitize_email( $_POST['post_title'] );
 
       // is email valid 
+      $post_id_match = '';
       if(! is_email( $email ) ){
         set_transient( 'error', __( 'You need to enter a valid email address', STC_TEXTDOMAIN ) ); // set error if not valid
       } else {
@@ -936,7 +945,14 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
         $subject = '=?UTF-8?B?'.base64_encode( $email_subject ).'?=';
 
-        wp_mail( $email['email'], $subject, $message, $headers );
+
+        if( STC_DEV_MODE === true ){
+          echo $subject . '<br>' . $message;
+          die();
+        }else{
+          wp_mail( $email['email'], $subject, $message, $headers );  
+        }
+
 
         // sleep 2 seconds once every 25 email to prevent blacklisting
         if( $i == $this->sleep_flag ){
@@ -985,11 +1001,28 @@ if( class_exists( 'STC_Subscribe' ) ) {
      * @param  object $email
      */    
     private function email_html_content( $email ){
+      $sum_of_words = 130;
+
+      $output['title']        = '<h3><a href="' . get_permalink( $email['post_id'] ) . '">' . $email['post']->post_title . '</a></h3>';
+      $output['link_to_post'] = '<div style="border-bottom: 1px solid #cccccc; padding-bottom: 10px;"><a href="' . get_permalink( $email['post_id'] ) .'">' . __('Click here to read full story', STC_TEXTDOMAIN ) . '</a></div>';
+      $output['unsubscribe']  = '<div style="margin-top: 20px;"><a href="' . get_bloginfo('url') . '/?stc_unsubscribe=' . $email['hash'] . '&stc_user=' . $email['email'] . '">' . __('Unsubscribe me', STC_TEXTDOMAIN ) . '</a></div>';
+
       ?>
-      <h3><a href="<?php echo get_permalink( $email['post_id']) ?>"><?php echo $email['post']->post_title; ?></a></h3>
-      <div><?php echo apply_filters('the_content', $this->string_cut( $email['post']->post_content, 130 ) );?></div>
-      <div style="border-bottom: 1px solid #cccccc; padding-bottom: 10px;"><a href="<?php echo get_permalink( $email['post_id'] ); ?>"> <?php _e('Click here to read full story', STC_TEXTDOMAIN ); ?></a></div>
-      <div style="margin-top: 20px;"><a href="<?php echo get_bloginfo('url') . '/?stc_unsubscribe=' . $email['hash'] . '&stc_user=' . $email['email']; ?>"><?php _e('Unsubscribe me', STC_TEXTDOMAIN ); ?></a></div>
+      <?php do_action( 'stc_before_message', $email['post_id'], $email['subscriber_id'] ); ?>
+      
+      <?php do_action( 'stc_before_message_title', $email['post_id'], $email['subscriber_id'] ); ?>
+      <?php echo apply_filters( 'stc_message_title_html', $output['title'], $email['post_id'], $email['subscriber_id'] ); ?>
+      <?php do_action( 'stc_after_message_title', $email['post_id'], $email['subscriber_id'] ); ?>
+
+      <?php do_action( 'stc_before_message_content', $email['post_id'], $email['subscriber_id'] ); ?>
+      <div><?php echo apply_filters('the_content', $this->string_cut( $email['post']->post_content, apply_filters( 'stc_message_length_sum_of_words', $sum_of_words ) ) );?></div>
+      <?php do_action( 'stc_after_message_content', $email['post_id'], $email['subscriber_id'] ); ?>
+
+      <?php echo apply_filters( 'stc_message_link_to_post_html', $output['link_to_post'] ); ?>
+      <?php echo apply_filters( 'stc_message_unsubscribe_html', $output['unsubscribe'] ); ?>
+
+      <?php do_action( 'stc_after_message', $email['post_id'], $email['subscriber_id'] ); ?>
+
       <?php
     }
 
@@ -1003,7 +1036,10 @@ if( class_exists( 'STC_Subscribe' ) ) {
      * @param  int $max_length
      * @return string
      */
-    private function string_cut( $string, $max_length ){  
+    private function string_cut( $string, $max_length ){
+
+      if( $max_length < 0 )
+        return $string;
 
       // remove shortcode if there is
       $string = strip_shortcodes( $string ); 
