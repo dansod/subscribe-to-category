@@ -782,7 +782,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
           <div class="stc-categories"<?php echo $post_stc_unsubscribe == 1 ? ' style="display:none;"' : NULL; ?>>
             <?php if(! empty( $cats )) :?>
-              <?php if count ($cats) > 1 ) : ?>
+              <?php if (count ($cats) > 1 ) : ?>
                 <h3><?php _e('Categories', STC_TEXTDOMAIN ); ?></h3>
                 <?php if( $this->show_all_categories === true ) : ?>
                   <div class="checkbox">
