@@ -792,25 +792,24 @@ if( class_exists( 'STC_Subscribe' ) ) {
                     </label>
                   </div>
                 <?php endif; ?>
-            <?php endif; ?>
-            <div class="stc-categories-checkboxes">
-            <?php if(! empty( $cats ) ) : ?>
-              <?php if(count($cats)>1 ) : ?>
-    	        <?php foreach ($cats as $cat ) : ?>
-                  <div class="checkbox">
-      		    <label>
-      		      <input type="checkbox" name="stc_categories[]" value="<?php echo $cat->cat_ID ?>">
-      		      <?php echo $cat->cat_name; ?>
-      		    </label>
-                  </div>
-                <?php endforeach; ?>
-              <?php else: ?>
-                <input type="hidden" name="stc_categories[]" value="<?php echo $cat[0]->cat_ID ?>">
               <?php endif; ?>
+              <div class="stc-categories-checkboxes">
+                <?php if(count($cats)>1 ) : ?>
+    	          <?php foreach ($cats as $cat ) : ?>
+                    <div class="checkbox">
+      		      <label>
+      		        <input type="checkbox" name="stc_categories[]" value="<?php echo $cat->cat_ID ?>">
+      		        <?php echo $cat->cat_name; ?>
+      		      </label>
+                    </div>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <input type="hidden" name="stc_categories[]" value="<?php echo $cat[0]->cat_ID ?>">
+                <?php endif; ?>
+              </div><!-- .stc-categories-checkboxes -->
             <?php endif; ?>
-            </div><!-- .stc-categories-checkboxes -->
           </div><!-- .stc-categories -->
-        <?php endif; ?>
+
 
   				<input type="hidden" name="action" value="stc_subscribe_me" />
   				<?php wp_nonce_field( 'wp_nonce_stc', 'stc_nonce', true, true ); ?>
