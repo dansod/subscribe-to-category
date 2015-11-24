@@ -804,7 +804,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
                     </div>
                   <?php endforeach; ?>
                 <?php else: ?>
-                  <input type="hidden" name="stc_categories[]" value="<?php echo $cat[0]->cat_ID ?>">
+                  <input type="hidden" name="stc_categories[]" value="<?php echo $cats[0]->cat_ID ?>">
                 <?php endif; ?>
               </div><!-- .stc-categories-checkboxes -->
             <?php endif; ?>
