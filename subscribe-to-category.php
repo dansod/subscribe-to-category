@@ -22,6 +22,7 @@
   require_once( 'classes/class-main.php' );
   require_once( 'classes/class-settings.php' );
   require_once( 'classes/class-subscribe.php' );
+  require_once( 'classes/class-stc-widget.php' );
 
   // Create instance for main class
   add_action( 'plugins_loaded', array( 'STC_Main', 'get_instance' ) );
