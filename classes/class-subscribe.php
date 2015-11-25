@@ -728,7 +728,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
      * @param  array  $cats_all All categories
      * @param  string $cats_id_in  Categories entered in shortcode
      *
-     * @since 9.9.9
+     * @since 1.6.0
      *
      * @return array            Array with categories to show
      */
@@ -757,7 +757,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
      * @param  array  $cats_all    All categories
      * @param  string $cats_id_not_in Categories entered in shortcode
      *
-     * @since 9.9.9
+     * @since 1.6.0
      * 
      * @return array                Array with categories to show
      */

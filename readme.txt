@@ -2,8 +2,8 @@
 Contributors: dansod
 Tags: subscribe to post, subscribe to category, subscribe to news, subscribe
 Requires at least: 3.9
-Tested up to: 4.3
-Stable tag: 1.3
+Tested up to: 4.3.1
+Stable tag: 1.6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,7 +27,7 @@ The following settings and features are available for the administrator in curre
 *   Theres a note when next scheduled event for sending e-mails to subscribers is running.
 *   Options for leave no trace - deletes post meta and subscribers created by this plugin.
 *   Option for re-send a post on update that has already been sent.
-*   Shortcode attributes for showing and hiding some categories from subscribe form. 
+*   Implementation by widget or short code.
 
 
 = What Translations are included? =
@@ -48,13 +48,16 @@ This section describes how to install the plugin and get it working.
 1. Upload `subscribe-to-category` to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress Admin
 3. Save your settings 'Settings > Subscribe'.
-4. Create a page and add shortcode [stc-subscribe] to display stc form subscription.
+4. Create a page and add shortcode [stc-subscribe] or use the STC Widget to display stc form subscription.
 
 = Shortcode Attributes =
 'category_in' - Use this attribute if you only want one or several categories to be available for subscription. Value to be entered is the name of the category.
-'category_not_in' - Use this attribute if you want to exclude categories to be available for subscription. Value to be entered is the name of the category.
+'category_id_in' - The difference to above is to use the category ID instead of category name.
 
-For both attributes you can use a comma sign to separate multiple categories, like [stc-subscribe category_in="news, article"].
+'category_not_in' - Use this attribute if you want to exclude categories to be available for subscription. Value to be entered is the name of the category.
+'category_id_not_in' - The difference to above is to use the category ID instead of category name.
+
+For the above attributes you can use a comma sign to separate multiple categories, like [stc-subscribe category_in="news, article"].
 
 = Filter and hooks =
 Following filters and hooks can be used for customizing the email message.
@@ -103,6 +106,11 @@ Therefore a suggested interval for your server cron could be once every 5 minute
 4. When resend post is enabled in settings there is a new option available when editing a post.
 
 == Changelog ==
+
+= 1.6.0 =
+* Added a Widget for subscription form
+* Don't show category list if only one is available (thanks to davefx)
+* Extended short code attributes with an option to use category id instead of category name (thanks to Stingray_454)
 
 = 1.3 =
 * Added hooks and filters to make the plugin extensible
