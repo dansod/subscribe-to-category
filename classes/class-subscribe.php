@@ -723,6 +723,67 @@ if( class_exists( 'STC_Subscribe' ) ) {
  
     }
 
+    /**
+     * Filter to show categories by attribute 'category_id_in' in shortcode
+     *
+     * @param  array  $cats_all All categories
+     * @param  string $cats_id_in  Categories entered in shortcode
+     *
+     * @since 9.9.9
+     *
+     * @return array            Array with categories to show
+     */
+    private function filter_categories_id_in( $cats_all = '', $cats_id_in = '' ){
+
+      if(empty( $cats_all ))
+        return false;
+
+      $cats_id_in = explode(',', str_replace(', ', ',', $cats_id_in ) );
+
+      $filtered_cats = array();
+      foreach( $cats_id_in as $cat_id_in ){
+        foreach ($cats_all as $cat ) {
+          if( $cat_id_in == $cat->cat_ID )
+            $filtered_cats[] = $cat;
+        }
+      }
+
+      return $filtered_cats;
+
+    }  
+
+    /**
+     * Filter to exclude categories by attribute 'category_id_not_in' in shortcode
+     * 
+     * @param  array  $cats_all    All categories
+     * @param  string $cats_id_not_in Categories entered in shortcode
+     *
+     * @since 9.9.9
+     * 
+     * @return array                Array with categories to show
+     */
+    private function filter_categories_id_not_in( $cats_all = '', $cats_id_not_in = '' ){
+     
+      if(empty( $cats_all ))
+        return false;
+
+      $cats_id_not_in = explode(',', str_replace(', ', ',', $cats_id_not_in ) );        
+
+        $filtered_cats = $cats_all;
+          
+          foreach ($cats_all as $key => $cat ) {
+
+            foreach( $cats_id_not_in as $cat_id_not_in ){
+              if( mb_strtolower( $cat_id_not_in ) == mb_strtolower( $cat->cat_ID ) )
+                unset($filtered_cats[$key]);
+            }
+          
+        }
+
+        return $filtered_cats;
+ 
+    }      
+
   	/**
   	 * Html for subscribe form
      *
@@ -735,6 +796,9 @@ if( class_exists( 'STC_Subscribe' ) ) {
       extract( shortcode_atts( array(
         'category_in' => false,
         'category_not_in' => false,
+        'category_id_in' => false,
+        'category_id_not_in' => false,
+        
       ), $atts ));
 
       // add hook when we have a request to render html
@@ -746,8 +810,16 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
       if( !empty( $category_in ) ){
         $cats = $this->filter_categories_in( $cats, $category_in );
+        
+      }elseif( !empty( $category_id_in ) ){
+        $cats = $this->filter_categories_id_in( $cats, $category_id_in );
+
       }elseif( !empty( $category_not_in ) ){
         $cats = $this->filter_categories_not_in( $cats, $category_not_in );
+
+      }elseif( !empty( $category_id_not_in ) ){
+        $cats = $this->filter_categories_id_not_in( $cats, $category_id_not_in );
+
       }
 
       // if error store email address in field value so user dont need to add it again
