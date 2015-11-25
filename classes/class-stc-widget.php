@@ -9,7 +9,7 @@ class STC_Widget extends WP_Widget {
 		parent::__construct(
 			'stc_widget', // Base ID
 			__( 'Subscribe to Category', STC_TEXTDOMAIN ), // Name
-			array( 'description' => __( 'A STC Widget', STC_TEXTDOMAIN ), ) // Args
+			array( 'description' => __( 'Adding the subscribe form to a widget area.', STC_TEXTDOMAIN ), ) // Args
 		);
 	}
 
@@ -44,7 +44,7 @@ class STC_Widget extends WP_Widget {
 	 * @param array $instance Previously saved values from database.
 	 */
 	public function form( $instance ) {
-		$title = ! empty( $instance['title'] ) ? $instance['title'] : __( 'New title', 'text_domain' );
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Subscribe', STC_TEXTDOMAIN );
 		$categories_include = isset( $instance['categories_include'] ) ? $instance['categories_include'] : '';
 		$categories_exclude = isset( $instance['categories_exclude'] ) ? $instance['categories_exclude'] : '';
 
@@ -55,9 +55,14 @@ class STC_Widget extends WP_Widget {
 		<p>
 		<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label>
 		<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+		<p>
+			<em><?php _e('As default all categories are available for subscription. You should only use the checkboxes below if you want to include or exclude some categories for subscription.') ?></em>
+		</p>
 
-		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Categories in', STC_TEXTDOMAIN ); ?></label></p>
-		
+		<p>
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Selectable categories for subscription: ', STC_TEXTDOMAIN ); ?></label>
+		</p>
+
 		<?php if(! empty( $categories ) ) : ?>
 			<div class="stc-category-include">
 			<?php 
@@ -69,9 +74,7 @@ class STC_Widget extends WP_Widget {
 			</div>
 		<?php endif; ?>
 		
-
-
-		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Categories not in', STC_TEXTDOMAIN ); ?></label></p>
+		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Excluded selectable categories for subscription:', STC_TEXTDOMAIN ); ?></label></p>
 		<?php if(! empty( $categories ) ) : ?>
 			<div class="stc-category-exclude">
 			<?php 
@@ -100,23 +103,18 @@ class STC_Widget extends WP_Widget {
 	 * @return array Updated safe values to be saved.
 	 */
 	public function update( $new_instance, $old_instance ) {
-		//util::debug( $new_instance, $old_instance );
-		//die();
 
 		$instance = array();
 		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
 		$instance['categories_include'] = ( ! empty( $new_instance['categories_include'] ) ) ? $new_instance['categories_include'] : '';
 		$instance['categories_exclude'] = ( ! empty( $new_instance['categories_exclude'] ) ) ? $new_instance['categories_exclude'] : '';
 
-		//util::debug( $instance );
-		//die();
-
 		return $instance;
 	}
 
 } // class Foo_Widget
 
-// register Foo_Widget widget
+// register STC_Widget
 function register_stc_widget() {
     register_widget( 'STC_Widget' );
 }
