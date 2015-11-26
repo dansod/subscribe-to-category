@@ -124,7 +124,7 @@ Therefore a suggested interval for your server cron could be once every 5 minute
 = 1.2.0 =
 * Possibillity to re-send a post on update that has already been sent. This option needs to be activated in the settings for the plugin.
 * Attribute 'category_in' added to shortcode to show only entered categories in the subscribe form. Multiple categories are separated by a comma sign.
-* Attribute 'category_not_in' added to shortcode to exclude categories in the subscribe form. Multiple categories are separated by a comma sign.
+* Attribute 'category_not_in' added to shortcode to exclude categories in the subscribe form. Multiple categories are separated by a comma sign. 
 
 
 = 1.1.0 =
