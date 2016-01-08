@@ -2,8 +2,8 @@
 Contributors: dansod
 Tags: subscribe to post, subscribe to category, subscribe to news, subscribe
 Requires at least: 3.9
-Tested up to: 4.3.1
-Stable tag: 1.6.0
+Tested up to: 4.4.1
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -82,6 +82,13 @@ add_action( 'stc_before_message_content', 'my_stc_before_message_content', 10, 2
 add_action( 'stc_after_message_content', 'my_stc_after_message_content', 10, 2 );
 add_action( 'stc_after_message', 'my_stc_after_message', 10, 2 );
 
+// Parameters: $subscriber_post_id, $categories, bool $all_categories
+add_action( 'stc_after_update_subscriber', 'my_stc_after_update_subscriber', 10, 3 );
+add_action( 'stc_after_insert_subscriber', 'my_stc_after_insert_subscriber', 10, 3 );
+
+// Parameters: $subscriber_post_id, 
+add_action( 'stc_before_unsubscribe', 'my_stc_before_unsubscribe', 10, 1 ); // runs before deleting a subscriber from database
+
 
 /**
  * Example for adding featured image to STC email
@@ -106,6 +113,9 @@ Therefore a suggested interval for your server cron could be once every 5 minute
 4. When resend post is enabled in settings there is a new option available when editing a post.
 
 == Changelog ==
+
+= 1.7.0 =
+* Added some new hooks: stc_after_update_subscriber, stc_after_insert_subscriber, stc_before_unsubscribe
 
 = 1.6.0 =
 * Added a Widget for subscription form

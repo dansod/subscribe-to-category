@@ -216,8 +216,10 @@ if( class_exists( 'STC_Subscribe' ) ) {
         $notice[] = __('We are sorry but something went wrong with your unsubscription.');
         return $this->notice = $notice;
       }
-    
-
+      
+      // hook right before deleting post
+      do_action( 'stc_before_unsubscribe', $user_id ); 
+      
       $subscriber_email = get_the_title( $user_id );
       wp_delete_post( $user_id );
 
@@ -477,9 +479,15 @@ if( class_exists( 'STC_Subscribe' ) ) {
   		// update post if subscriber exist, else insert as new post
   		if(!empty( $post_id )){
   			$post_id = wp_update_post( $post_data );
+
+        // hook after updating a subscriber
+        do_action( 'stc_after_update_subscriber', $post_id, $data['categories'], $data['all_categories'] == true ? '1' : '0' ); 
   		}else{
   			$post_id = wp_insert_post( $post_data );
         update_post_meta( $post_id, '_stc_hash', md5( $data['email'].time() ) );
+        
+        // hook after inserting a subscriber
+        do_action( 'stc_after_insert_subscriber', $post_id, $data['categories'], $data['all_categories'] == true ? '1' : '0' );
   		}
 
       // update post meta if the user subscribes to all categories
