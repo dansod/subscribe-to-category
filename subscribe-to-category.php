@@ -3,7 +3,7 @@
   Plugin Name: Subscribe to Category
   Plugin URI: http://dcweb.nu
   Description: Lets your visitor subscribe to posts for one or several categories.
-  Version: 1.8.2
+  Version: 1.8.1
   Author: Daniel Söderström 
   Author URI: http://dcweb.nu/
   License: GPLv2 or later
