@@ -8,8 +8,8 @@ class STC_Widget extends WP_Widget {
 	function __construct() {
 		parent::__construct(
 			'stc_widget', // Base ID
-			__( 'Subscribe to Category', STC_TEXTDOMAIN ), // Name
-			array( 'description' => __( 'Adding the subscribe form to a widget area.', STC_TEXTDOMAIN ), ) // Args
+			__( 'Subscribe to Category', 'stc_textdomain' ), // Name
+			array( 'description' => __( 'Adding the subscribe form to a widget area.', 'stc_textdomain' ), ) // Args
 		);
 	}
 
@@ -44,7 +44,7 @@ class STC_Widget extends WP_Widget {
 	 * @param array $instance Previously saved values from database.
 	 */
 	public function form( $instance ) {
-		$title = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Subscribe', STC_TEXTDOMAIN );
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Subscribe', 'stc_textdomain' );
 		$categories_include = isset( $instance['categories_include'] ) ? $instance['categories_include'] : '';
 		$categories_exclude = isset( $instance['categories_exclude'] ) ? $instance['categories_exclude'] : '';
 
@@ -60,7 +60,7 @@ class STC_Widget extends WP_Widget {
 		</p>
 
 		<p>
-			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Selectable categories for subscription: ', STC_TEXTDOMAIN ); ?></label>
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Selectable categories for subscription: ', 'stc_textdomain' ); ?></label>
 		</p>
 
 		<?php if(! empty( $categories ) ) : ?>
@@ -74,7 +74,7 @@ class STC_Widget extends WP_Widget {
 			</div>
 		<?php endif; ?>
 		
-		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Excluded selectable categories for subscription:', STC_TEXTDOMAIN ); ?></label></p>
+		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Excluded selectable categories for subscription:', 'stc_textdomain' ); ?></label></p>
 		<?php if(! empty( $categories ) ) : ?>
 			<div class="stc-category-exclude">
 			<?php 

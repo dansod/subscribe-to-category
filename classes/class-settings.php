@@ -52,7 +52,7 @@ if( class_exists( 'STC_Settings' ) ) {
       $subscriber = STC_Subscribe::get_instance();
       $subscriber->stc_send_email();
 
-      _e( 'Scheduled event successfully executed', STC_TEXTDOMAIN );
+      _e( 'Scheduled event successfully executed', 'stc_textdomain' );
 
       die();
     }
@@ -76,8 +76,8 @@ if( class_exists( 'STC_Settings' ) ) {
       }
       
       add_options_page(
-        __( 'Subscribe to Category', STC_TEXTDOMAIN ), 
-        __( 'Subscribe', STC_TEXTDOMAIN ), 
+        __( 'Subscribe to Category', 'stc_textdomain' ), 
+        __( 'Subscribe', 'stc_textdomain' ), 
         'manage_options', 
         'stc-subscribe-settings', 
         array( $this, 'create_admin_page' )
@@ -100,18 +100,18 @@ if( class_exists( 'STC_Settings' ) ) {
       ?>
       <div class="wrap">
         <?php screen_icon(); ?>
-        <h2><?php _e('Settings for subscribe to category', STC_TEXTDOMAIN ); ?></h2>       
+        <h2><?php _e('Settings for subscribe to category', 'stc_textdomain' ); ?></h2>       
 
 
         <table class="widefat">
           <tbody>
             <tr>
-              <td class="desc"><strong><?php _e( 'Schedule: ', STC_TEXTDOMAIN ); ?></strong> <?php _e('E-mail is scheduled to be sent once every hour.', STC_TEXTDOMAIN ); ?></td>
+              <td class="desc"><strong><?php _e( 'Schedule: ', 'stc_textdomain' ); ?></strong> <?php _e('E-mail is scheduled to be sent once every hour.', 'stc_textdomain' ); ?></td>
               <td class="desc"></td>
-              <td class="desc textright"><div class="stc-force-run-action"><button type="button" id="stc-force-run" class="button button-primary"><?php _e( 'Click here to run this action right now', STC_TEXTDOMAIN ); ?></button></div></td>
+              <td class="desc textright"><div class="stc-force-run-action"><button type="button" id="stc-force-run" class="button button-primary"><?php _e( 'Click here to run this action right now', 'stc_textdomain' ); ?></button></div></td>
             </tr>
             <tr>
-              <td class="desc" colspan="3"><?php printf( __('Next run is going to be <strong>%s</strong> and will include %s posts.', STC_TEXTDOMAIN ), $next_run, '<span id="stc-posts-in-que">' . $this->get_posts_in_que() . '</span>' ); ?></td>
+              <td class="desc" colspan="3"><?php printf( __('Next run is going to be <strong>%s</strong> and will include %s posts.', 'stc_textdomain' ), $next_run, '<span id="stc-posts-in-que">' . $this->get_posts_in_que() . '</span>' ); ?></td>
             </tr>
           </tbody>
         </table>
@@ -187,14 +187,14 @@ if( class_exists( 'STC_Settings' ) ) {
         // Email settings
         add_settings_section(
             'setting_email_id', // ID
-            __( 'E-mail settings', STC_TEXTDOMAIN ), // Title
+            __( 'E-mail settings', 'stc_textdomain' ), // Title
             '', //array( $this, 'print_section_info' ), // Callback
             'stc-subscribe-settings' // Page
         );  
 
         add_settings_field(
             'stc_email_from',
-            __( 'E-mail from: ', STC_TEXTDOMAIN ),
+            __( 'E-mail from: ', 'stc_textdomain' ),
             array( $this, 'stc_email_from_callback' ), // Callback
             'stc-subscribe-settings', // Page
             'setting_email_id' // Section           
@@ -202,7 +202,7 @@ if( class_exists( 'STC_Settings' ) ) {
 
         add_settings_field(
             'stc_title',
-            __( 'Email subject: ', STC_TEXTDOMAIN ),
+            __( 'Email subject: ', 'stc_textdomain' ),
             array( $this, 'stc_title_callback' ), // Callback
             'stc-subscribe-settings', // Page
             'setting_email_id' // Section           
@@ -212,14 +212,14 @@ if( class_exists( 'STC_Settings' ) ) {
         // Resend settings
         add_settings_section(
             'setting_resend_id', // ID
-            __( 'Resend post on update', STC_TEXTDOMAIN ), // Title
+            __( 'Resend post on update', 'stc_textdomain' ), // Title
             '', //array( $this, 'print_section_info' ), // Callback
             'stc-resend-settings' // Page
         );  
 
         add_settings_field(
             'stc_resend',
-            __( 'Resend:', STC_TEXTDOMAIN ),
+            __( 'Resend:', 'stc_textdomain' ),
             array( $this, 'stc_resend_callback' ), // Callback
             'stc-resend-settings', // Page
             'setting_resend_id' // Section           
@@ -229,14 +229,14 @@ if( class_exists( 'STC_Settings' ) ) {
         // Styleing settings
         add_settings_section(
             'setting_style_id', // ID
-            __( 'Stylesheet (CSS) settings', STC_TEXTDOMAIN ), // Title
+            __( 'Stylesheet (CSS) settings', 'stc_textdomain' ), // Title
             '', //array( $this, 'print_section_info' ), // Callback
             'stc-style-settings' // Page
         );  
 
         add_settings_field(
             'stc_custom_css',
-            __( 'Custom CSS: ', STC_TEXTDOMAIN ),
+            __( 'Custom CSS: ', 'stc_textdomain' ),
             array( $this, 'stc_css_callback' ), // Callback
             'stc-style-settings', // Page
             'setting_style_id' // Section           
@@ -246,14 +246,14 @@ if( class_exists( 'STC_Settings' ) ) {
         // Deactivation settings
         add_settings_section(
             'setting_deactivation_id', // ID
-            __( 'On plugin deactivation', STC_TEXTDOMAIN ), // Title
+            __( 'On plugin deactivation', 'stc_textdomain' ), // Title
             array( $this, 'section_deactivation_info' ), // Callback
             'stc-deactivation-settings' // Page
         );          
 
         add_settings_field(
             'stc_remove_subscribers',
-            __( 'Subscribers: ', STC_TEXTDOMAIN ),
+            __( 'Subscribers: ', 'stc_textdomain' ),
             array( $this, 'stc_remove_subscribers_callback' ), // Callback
             'stc-deactivation-settings', // Page
             'setting_deactivation_id' // Section           
@@ -277,7 +277,7 @@ if( class_exists( 'STC_Settings' ) ) {
      */
     public function section_deactivation_info(){
       ?>
-      <p><?php _e('The plugin will remove all data in database created by this plugin but there is an option regarding subscribers', STC_TEXTDOMAIN ); ?></p>
+      <p><?php _e('The plugin will remove all data in database created by this plugin but there is an option regarding subscribers', 'stc_textdomain' ); ?></p>
       <?php
     }
 
@@ -298,7 +298,7 @@ if( class_exists( 'STC_Settings' ) ) {
           
           if(! empty( $input['email_from'] )){
             if ( ! is_email( $output['email_from'] ) ){
-              add_settings_error( 'setting_email_id', 'invalid-email', __( 'You have entered an invalid email.', STC_TEXTDOMAIN ) );
+              add_settings_error( 'setting_email_id', 'invalid-email', __( 'You have entered an invalid email.', 'stc_textdomain' ) );
             }
           }
         }
@@ -329,7 +329,7 @@ if( class_exists( 'STC_Settings' ) ) {
      * 
      */
     public function print_section_info(){
-      _e( 'Add your E-mail settings', STC_TEXTDOMAIN );
+      _e( 'Add your E-mail settings', 'stc_textdomain' );
     }
 
     /** 
@@ -342,7 +342,7 @@ if( class_exists( 'STC_Settings' ) ) {
       $default_email = get_option( 'admin_email' );
       ?>
         <input type="text" id="email_from" class="regular-text" name="stc_settings[email_from]" value="<?php echo isset( $this->options['email_from'] ) ? esc_attr( $this->options['email_from'] ) : '' ?>" />
-        <p class="description"><?php printf( __( 'Enter the e-mail address for the sender, if empty the admin e-mail address %s is going to be used as sender.', STC_TEXTDOMAIN ), $default_email ); ?></p>
+        <p class="description"><?php printf( __( 'Enter the e-mail address for the sender, if empty the admin e-mail address %s is going to be used as sender.', 'stc_textdomain' ), $default_email ); ?></p>
         <?php
     }
 
@@ -355,7 +355,7 @@ if( class_exists( 'STC_Settings' ) ) {
     public function stc_title_callback() {
       ?>
         <input type="text" id="email_from" class="regular-text" name="stc_settings[title]" value="<?php echo isset( $this->options['title'] ) ? esc_attr( $this->options['title'] ) : '' ?>" />
-        <p class="description"><?php _e( 'Enter e-mail subject for the e-mail notification, leave empty if you wish to use post title as email subject.', STC_TEXTDOMAIN ); ?></p>
+        <p class="description"><?php _e( 'Enter e-mail subject for the e-mail notification, leave empty if you wish to use post title as email subject.', 'stc_textdomain' ); ?></p>
         <?php
     }
 
@@ -373,8 +373,8 @@ if( class_exists( 'STC_Settings' ) ) {
         $options['resend_option'] = $this->options['resend_option'];
       ?>
 
-      <label for="resend_option"><input type="checkbox" value="1" id="resend_option" name="stc_settings[resend_option]" <?php checked( '1', $options['resend_option'] ); ?>><?php _e('Enable resend post option', STC_TEXTDOMAIN ); ?></label>
-      <p class="description"><?php _e('Gives an option on edit post (in the publish panel) to resend a post on update.', STC_TEXTDOMAIN ); ?></p>
+      <label for="resend_option"><input type="checkbox" value="1" id="resend_option" name="stc_settings[resend_option]" <?php checked( '1', $options['resend_option'] ); ?>><?php _e('Enable resend post option', 'stc_textdomain' ); ?></label>
+      <p class="description"><?php _e('Gives an option on edit post (in the publish panel) to resend a post on update.', 'stc_textdomain' ); ?></p>
     <?php
     }    
 
@@ -391,8 +391,8 @@ if( class_exists( 'STC_Settings' ) ) {
         $options['exclude_css'] = $this->options['exclude_css'];
       ?>
 
-      <label for="exclude_css"><input type="checkbox" value="1" id="exclude_css" name="stc_settings[exclude_css]" <?php checked( '1', $options['exclude_css'] ); ?>><?php _e('Exclude custom CSS', STC_TEXTDOMAIN ); ?></label>
-      <p class="description"><?php _e('Check this option if your theme supports Bootstrap framework or if you want to place your own CSS for Subscribe to Category in your theme.', STC_TEXTDOMAIN ); ?></p>
+      <label for="exclude_css"><input type="checkbox" value="1" id="exclude_css" name="stc_settings[exclude_css]" <?php checked( '1', $options['exclude_css'] ); ?>><?php _e('Exclude custom CSS', 'stc_textdomain' ); ?></label>
+      <p class="description"><?php _e('Check this option if your theme supports Bootstrap framework or if you want to place your own CSS for Subscribe to Category in your theme.', 'stc_textdomain' ); ?></p>
     <?php
     }
 
@@ -410,7 +410,7 @@ if( class_exists( 'STC_Settings' ) ) {
   
       ?>
 
-      <label for="deactivation_remove_subscribers"><input type="checkbox" value="1" id="deactivation_remove_subscribers" name="stc_settings[deactivation_remove_subscribers]" <?php checked( '1', $options['deactivation_remove_subscribers'] ); ?>><?php _e('Delete all subscribers on deactivation', STC_TEXTDOMAIN ); ?></label>
+      <label for="deactivation_remove_subscribers"><input type="checkbox" value="1" id="deactivation_remove_subscribers" name="stc_settings[deactivation_remove_subscribers]" <?php checked( '1', $options['deactivation_remove_subscribers'] ); ?>><?php _e('Delete all subscribers on deactivation', 'stc_textdomain' ); ?></label>
     <?php
     }        
 
@@ -423,19 +423,19 @@ if( class_exists( 'STC_Settings' ) ) {
     public function export_to_excel_form(){
       $categories = get_categories( array( 'hide_empty' => false ) ); 
       ?>
-      <h3><?php _e( 'Export to excel', STC_TEXTDOMAIN ); ?></h3>
+      <h3><?php _e( 'Export to excel', 'stc_textdomain' ); ?></h3>
       <form method="post" action="options-general.php?page=stc-subscribe-settings">
       <table class="form-table">
         <tbody>
           <tr>
-            <th scope="row"><?php _e('Filter by categories', STC_TEXTDOMAIN ); ?></th>
+            <th scope="row"><?php _e('Filter by categories', 'stc_textdomain' ); ?></th>
             <td>
               <?php if(! empty( $categories )) : ?>
                 <?php foreach( $categories as $cat ) : ?>
                   <label for="<?php echo $cat->slug; ?>"><input type="checkbox" name="in_categories[]" id="<?php echo $cat->slug; ?>" value="<?php echo $cat->term_id; ?>"><?php echo $cat->name; ?></label>
                 <?php endforeach; ?>
               <?php else: ?>
-                <?php _e('There are no categories to list yet', STC_TEXTDOMAIN ); ?>
+                <?php _e('There are no categories to list yet', 'stc_textdomain' ); ?>
               <?php endif; ?>
             </td>
           </tr>
@@ -506,7 +506,7 @@ if( class_exists( 'STC_Settings' ) ) {
       $flag = false; 
       // print out filtered categories if there is
       if(!empty( $in_category_name ))
-        echo "\r\n", utf8_decode( __('Filtered by: ', STC_TEXTDOMAIN ) ) . utf8_decode( $in_category_name ); 
+        echo "\r\n", utf8_decode( __('Filtered by: ', 'stc_textdomain' ) ) . utf8_decode( $in_category_name ); 
       
       foreach ($export as $row ) {
         if(! $flag ) { 

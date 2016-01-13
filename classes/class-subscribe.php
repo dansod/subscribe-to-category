@@ -99,9 +99,9 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
       ?>
         <div class="misc-pub-section stc-section">
-          <span class="dashicons dashicons-groups"></span> <label><?php _e('Resend post to subscribers', STC_TEXTDOMAIN ); ?> <input id="stc-resend" type="checkbox" name="stc_resend"></label>
+          <span class="dashicons dashicons-groups"></span> <label><?php _e('Resend post to subscribers', 'stc_textdomain' ); ?> <input id="stc-resend" type="checkbox" name="stc_resend"></label>
           <div id="stc-resend-info" style="display:none;">
-            <p><i><?php printf( __( 'This post update will be re-sent to subscribers %s', STC_TEXTDOMAIN ), $next_run ); ?></i></p>
+            <p><i><?php printf( __( 'This post update will be re-sent to subscribers %s', 'stc_textdomain' ), $next_run ); ?></i></p>
           </div>
         </div>
       <?php
@@ -155,7 +155,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
     <div id="stc-unsubscribe-wrapper" class="">
       <div class="alert alert-success text-center">
         <p><?php echo $this->notice[0]; ?></p>
-        <p><a href="<?php echo get_bloginfo('url'); ?>"><?php _e( 'Take me to start page', STC_TEXTDOMAIN ); ?></a></p>
+        <p><a href="<?php echo get_bloginfo('url'); ?>"><?php _e( 'Take me to start page', 'stc_textdomain' ); ?></a></p>
       </div>
     </div>
       <?php
@@ -184,8 +184,8 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
       // notice on subscription
       if (isset( $_GET['stc_status'] ) && $_GET['stc_status'] == 'success' ) {
-        $this->notice[] = __( 'Thanks for your subscription!', STC_TEXTDOMAIN );
-        $this->notice[] = __( 'If you want to unsubscribe there is a link for unsubscription attached in the email.', STC_TEXTDOMAIN );
+        $this->notice[] = __( 'Thanks for your subscription!', 'stc_textdomain' );
+        $this->notice[] = __( 'If you want to unsubscribe there is a link for unsubscription attached in the email.', 'stc_textdomain' );
       }
 
     }
@@ -223,7 +223,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
       $subscriber_email = get_the_title( $user_id );
       wp_delete_post( $user_id );
 
-      $notice[] = sprintf( __( 'We have successfully removed your email %s from our database.', STC_TEXTDOMAIN ), '<span class="stc-notice-email">' . $subscriber_email . '</span>' );
+      $notice[] = sprintf( __( 'We have successfully removed your email %s from our database.', 'stc_textdomain' ), '<span class="stc-notice-email">' . $subscriber_email . '</span>' );
       
       return $this->notice = $notice;
 
@@ -309,7 +309,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
       $headers .= 'From: '. $website_name.' <'.$email_from.'>' . "\r\n";
 
       // Setting subject
-      $title = sprintf( __('Unsubscribe from %s', STC_TEXTDOMAIN),  get_bloginfo( 'name' ) );
+      $title = sprintf( __('Unsubscribe from %s', 'stc_textdomain'),  get_bloginfo( 'name' ) );
 
 
       ob_start(); // start buffer
@@ -335,8 +335,8 @@ if( class_exists( 'STC_Subscribe' ) ) {
         return false;
       
       ?>
-        <h3><?php printf( __('Unsubscribe from %s', STC_TEXTDOMAIN ), get_bloginfo( 'name' ) ); ?></h3>
-        <div style="margin-top: 20px;"><a href="<?php echo get_bloginfo('url') . '/?stc_unsubscribe=' . $stc['hash'] . '&stc_user=' . $stc['email'] ?>"><?php _e('Follow this link to confirm your unsubscription', STC_TEXTDOMAIN ); ?></a></div>
+        <h3><?php printf( __('Unsubscribe from %s', 'stc_textdomain' ), get_bloginfo( 'name' ) ); ?></h3>
+        <div style="margin-top: 20px;"><a href="<?php echo get_bloginfo('url') . '/?stc_unsubscribe=' . $stc['hash'] . '&stc_user=' . $stc['email'] ?>"><?php _e('Follow this link to confirm your unsubscription', 'stc_textdomain' ); ?></a></div>
       <?php
 
     }
@@ -360,7 +360,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
           if( is_email( $_POST['stc_email'] ) )
             $data['email'] = $_POST['stc_email'];
           else
-            $error[] = __( 'You need to enter a valid email address', STC_TEXTDOMAIN );
+            $error[] = __( 'You need to enter a valid email address', 'stc_textdomain' );
           
           // check if user exists and through error if not          
           if(empty( $error )){
@@ -369,7 +369,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
             $result = $this->subscriber_exists();
 
             if( empty( $result ))
-              $error[] = __( 'Email address not found in database', STC_TEXTDOMAIN );
+              $error[] = __( 'Email address not found in database', 'stc_textdomain' );
           }
 
           if(! empty ($error ))
@@ -377,7 +377,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
           $this->send_unsubscribe_mail( $result );
 
-          $notice[] = __('We have received your request to unsubscribe from our newsfeed. Please check your email and confirm your unsubscription.', STC_TEXTDOMAIN );
+          $notice[] = __('We have received your request to unsubscribe from our newsfeed. Please check your email and confirm your unsubscription.', 'stc_textdomain' );
 
           return $this->notice = $notice;
         }
@@ -393,7 +393,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
  				if( is_email( $_POST['stc_email'] ) )
  					$data['email'] = $_POST['stc_email'];
  				else
- 					$error[] = __( 'You need to enter a valid email address', STC_TEXTDOMAIN );
+ 					$error[] = __( 'You need to enter a valid email address', 'stc_textdomain' );
 
         
         // subscribe for all categories
@@ -405,7 +405,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
  				if(! empty( $_POST['stc_categories'] ))
  					$data['categories'] = $_POST['stc_categories'];
  				else
- 					$error[] = __( 'You need to select some categories', STC_TEXTDOMAIN );
+ 					$error[] = __( 'You need to select some categories', 'stc_textdomain' );
 
 
         // save user to subscription post type if no error
@@ -541,18 +541,18 @@ if( class_exists( 'STC_Subscribe' ) ) {
       // is email valid 
       $post_id_match = '';
       if(! is_email( $email ) ){
-        set_transient( 'error', __( 'You need to enter a valid email address', STC_TEXTDOMAIN ) ); // set error if not valid
+        set_transient( 'error', __( 'You need to enter a valid email address', 'stc_textdomain' ) ); // set error if not valid
       } else {
         $this->data['email'] = $email;
         $post_id_match = $this->subscriber_exists();  
       }
         
       if( $post_id_match != $post_id || empty( $post_id_match )){
-        set_transient('error', __('E-mail address already exists', STC_TEXTDOMAIN ) ); // set error
+        set_transient('error', __('E-mail address already exists', 'stc_textdomain' ) ); // set error
       }
 
       if( $sum_of_post_categories < 1 ){
-       set_transient('error', __('No categories are selected', STC_TEXTDOMAIN ) );  // set error
+       set_transient('error', __('No categories are selected', 'stc_textdomain' ) );  // set error
       }
 
       $error = get_transient( 'error' );
@@ -594,7 +594,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
       if ( get_transient( 'error' ) ) {
         $error = get_transient( 'error' );
 
-        $error .= __( ' - this post is set to draft', STC_TEXTDOMAIN );
+        $error .= __( ' - this post is set to draft', 'stc_textdomain' );
         printf( '<div id="message" class="error"><p><strong>%s</strong></p></div>', $error );
         delete_transient( 'error' );
       } 
@@ -858,26 +858,26 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
   			<form role="form" method="post">
           <div class="form-group">
-  				  <label for="stc-email"><?php _e( 'E-mail Address: ', STC_TEXTDOMAIN ); ?></label>
+  				  <label for="stc-email"><?php _e( 'E-mail Address: ', 'stc_textdomain' ); ?></label>
   				  <input type="text" id="stc-email" class="form-control" name="stc_email" value="<?php echo !empty( $email ) ? $email : NULL; ?>"/>
           </div>
 
           <div class="checkbox">
             <label>
               <input type="checkbox" id="stc-unsubscribe-checkbox" name="stc-unsubscribe" value="1" <?php checked( '1', $post_stc_unsubscribe ); ?>>
-              <?php _e( 'Unsubscribe me', STC_TEXTDOMAIN ) ?>
+              <?php _e( 'Unsubscribe me', 'stc_textdomain' ) ?>
             </label>
           </div>
 
           <div class="stc-categories"<?php echo $post_stc_unsubscribe == 1 ? ' style="display:none;"' : NULL; ?>>
             <?php if(! empty( $cats )) :?>
               <?php if (count ($cats) > 1 ) : ?>
-                <h3><?php _e('Categories', STC_TEXTDOMAIN ); ?></h3>
+                <h3><?php _e('Categories', 'stc_textdomain' ); ?></h3>
                 <?php if( $this->show_all_categories === true ) : ?>
                   <div class="checkbox">
                     <label>
                       <input type="checkbox" id="stc-all-categories" name="stc_all_categories" value="1">
-                      <?php _e('All categories', STC_TEXTDOMAIN ); ?>
+                      <?php _e('All categories', 'stc_textdomain' ); ?>
                     </label>
                   </div>
                 <?php endif; ?>
@@ -902,8 +902,8 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
   				<input type="hidden" name="action" value="stc_subscribe_me" />
   				<?php wp_nonce_field( 'wp_nonce_stc', 'stc_nonce', true, true ); ?>
-          <button id="stc-subscribe-btn" type="submit" class="btn btn-default"<?php echo $post_stc_unsubscribe == 1 ? ' style="display:none;"' : NULL; ?>><?php _e( 'Subscribe me', STC_TEXTDOMAIN ) ?></button>
-          <button id="stc-unsubscribe-btn" type="submit" class="btn btn-default"<?php echo $post_stc_unsubscribe != 1 ? ' style="display:none;"' : NULL; ?>><?php _e( 'Unsubscribe', STC_TEXTDOMAIN ) ?></button>
+          <button id="stc-subscribe-btn" type="submit" class="btn btn-default"<?php echo $post_stc_unsubscribe == 1 ? ' style="display:none;"' : NULL; ?>><?php _e( 'Subscribe me', 'stc_textdomain' ) ?></button>
+          <button id="stc-unsubscribe-btn" type="submit" class="btn btn-default"<?php echo $post_stc_unsubscribe != 1 ? ' style="display:none;"' : NULL; ?>><?php _e( 'Unsubscribe', 'stc_textdomain' ) ?></button>
   			</form>
         <?php endif; ?>
 
@@ -1027,7 +1027,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
 
         // add updated to title if its an update for post
         if( $this->is_stc_resend( $email['post_id'] ) )
-          $email_subject = __('Update | ', STC_TEXTDOMAIN ) . $email_subject;
+          $email_subject = __('Update | ', 'stc_textdomain' ) . $email_subject;
 
         $subject = '=?UTF-8?B?'.base64_encode( $email_subject ).'?=';
 
@@ -1090,8 +1090,8 @@ if( class_exists( 'STC_Subscribe' ) ) {
       $sum_of_words = 130;
 
       $output['title']        = '<h3><a href="' . get_permalink( $email['post_id'] ) . '">' . $email['post']->post_title . '</a></h3>';
-      $output['link_to_post'] = '<div style="border-bottom: 1px solid #cccccc; padding-bottom: 10px;"><a href="' . get_permalink( $email['post_id'] ) .'">' . __('Click here to read full story', STC_TEXTDOMAIN ) . '</a></div>';
-      $output['unsubscribe']  = '<div style="margin-top: 20px;"><a href="' . get_bloginfo('url') . '/?stc_unsubscribe=' . $email['hash'] . '&stc_user=' . $email['email'] . '">' . __('Unsubscribe me', STC_TEXTDOMAIN ) . '</a></div>';
+      $output['link_to_post'] = '<div style="border-bottom: 1px solid #cccccc; padding-bottom: 10px;"><a href="' . get_permalink( $email['post_id'] ) .'">' . __('Click here to read full story', 'stc_textdomain' ) . '</a></div>';
+      $output['unsubscribe']  = '<div style="margin-top: 20px;"><a href="' . get_bloginfo('url') . '/?stc_unsubscribe=' . $email['hash'] . '&stc_user=' . $email['email'] . '">' . __('Unsubscribe me', 'stc_textdomain' ) . '</a></div>';
 
       ?>
       <?php do_action( 'stc_before_message', $email['post_id'], $email['subscriber_id'] ); ?>
@@ -1186,17 +1186,17 @@ if( class_exists( 'STC_Subscribe' ) ) {
   	public function register_post_type(){
 
 			$labels = array( 
-			    'name' => __( 'Subscribers', STC_TEXTDOMAIN ),
-			    'singular_name' => __( 'Subscribe', STC_TEXTDOMAIN ),
-			    'add_new' => __( 'Add new subscriber', STC_TEXTDOMAIN ),
-			    'add_new_item' => __( 'Add new subscriber', STC_TEXTDOMAIN ),
-			    'edit_item' => __( 'Edit subscriber', STC_TEXTDOMAIN ),
-			    'new_item' => __( 'New subscriber', STC_TEXTDOMAIN ),
-			    'view_item' => __( 'Show subscriber', STC_TEXTDOMAIN ),
-			    'search_items' => __( 'Search subscribers', STC_TEXTDOMAIN ),
-			    'not_found' => __( 'Not found', STC_TEXTDOMAIN ),
-			    'not_found_in_trash' => __( 'Nothing found in trash', STC_TEXTDOMAIN ),
-			    'menu_name' => __( 'Subscribers', STC_TEXTDOMAIN ),
+			    'name' => __( 'Subscribers', 'stc_textdomain' ),
+			    'singular_name' => __( 'Subscribe', 'stc_textdomain' ),
+			    'add_new' => __( 'Add new subscriber', 'stc_textdomain' ),
+			    'add_new_item' => __( 'Add new subscriber', 'stc_textdomain' ),
+			    'edit_item' => __( 'Edit subscriber', 'stc_textdomain' ),
+			    'new_item' => __( 'New subscriber', 'stc_textdomain' ),
+			    'view_item' => __( 'Show subscriber', 'stc_textdomain' ),
+			    'search_items' => __( 'Search subscribers', 'stc_textdomain' ),
+			    'not_found' => __( 'Not found', 'stc_textdomain' ),
+			    'not_found_in_trash' => __( 'Nothing found in trash', 'stc_textdomain' ),
+			    'menu_name' => __( 'Subscribers', 'stc_textdomain' ),
 			);
 
 			$args = array( 

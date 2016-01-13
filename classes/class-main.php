@@ -221,7 +221,7 @@ class STC_Main {
 	 * @since  1.0.0
 	 */
 	public function load_plugin_textdomain() {
-		load_plugin_textdomain( STC_TEXTDOMAIN, false, basename( plugin_dir_path( dirname( __FILE__ ) ) ) . '/languages/' ); 
+		load_plugin_textdomain( 'stc_textdomain', false, basename( plugin_dir_path( dirname( __FILE__ ) ) ) . '/languages/' ); 
 	}
 
 	/**
