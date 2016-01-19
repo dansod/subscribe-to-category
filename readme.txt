@@ -113,7 +113,7 @@ Therefore a suggested interval for your server cron could be once every 5 minute
 4. When resend post is enabled in settings there is a new option available when editing a post.
 
 == Changelog ==
-= 1.8.2 =
+= 1.8.1 =
 * Added pot file to be used for translation.
 * Bugfix - changed textdomain to string instead of constant.
 
