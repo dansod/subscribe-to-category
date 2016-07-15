@@ -2,8 +2,8 @@
 Contributors: dansod
 Tags: subscribe to post, subscribe to category, subscribe to news, subscribe
 Requires at least: 3.9
-Tested up to: 4.4.1
-Stable tag: 1.8.1
+Tested up to: 4.5.3
+Stable tag: 1.9.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,13 +31,18 @@ The following settings and features are available for the administrator in curre
 
 
 = What Translations are included? =
+* Dutch
 * English
 * French
+* German
 * Italian
+* Japanese
 * Lithuanian
+* Norwegian
 * Russian
 * Spanish
 * Swedish
+
 ____
 Have you translated this plugin to another language? Please send me your files to info@dcweb.nu and I will add them to the plugin.
 
@@ -113,26 +118,30 @@ Therefore a suggested interval for your server cron could be once every 5 minute
 4. When resend post is enabled in settings there is a new option available when editing a post.
 
 == Changelog ==
+= 1.9.0 =
+* Email address preset for logged in users.
+* Japanese, Dutch, German and Norwegian language added.
+
 = 1.8.1 =
 * Added pot file to be used for translation.
 * Bugfix - changed textdomain to string instead of constant.
 
 = 1.7.0 =
-* Added some new hooks: stc_after_update_subscriber, stc_after_insert_subscriber, stc_before_unsubscribe
+* Added some new hooks: stc_after_update_subscriber, stc_after_insert_subscriber, stc_before_unsubscribe.
 
 = 1.6.0 =
-* Added a Widget for subscription form
-* Don't show category list if only one is available (thanks to davefx)
-* Extended short code attributes with an option to use category id instead of category name (thanks to Stingray_454)
+* Added a Widget for subscription form.
+* Don't show category list if only one is available (thanks to davefx).
+* Extended short code attributes with an option to use category id instead of category name (thanks to Stingray_454).
 
 = 1.3 =
-* Added hooks and filters to make the plugin extensible
-* Added Lithuanian language thanks to Claudio
+* Added hooks and filters to make the plugin extensible.
+* Added Lithuanian language.
 
 = 1.2.1 =
-* Fixed some undefined variables that might have caused some errors for some environments
-* Renamed language files for russian language to correct syntax
-* Added Italian language thanks to Claudio
+* Fixed some undefined variables that might have caused some errors for some environments.
+* Renamed language files for russian language to correct syntax.
+* Added Italian language.
 
 = 1.2.0 =
 * Possibillity to re-send a post on update that has already been sent. This option needs to be activated in the settings for the plugin.
@@ -142,7 +151,7 @@ Therefore a suggested interval for your server cron could be once every 5 minute
 
 = 1.1.0 =
 * Added php sleep() function to prevent sending all e-mails in the same scope. 
-* Using Ajax when send is manually triggered in back-end
+* Using Ajax when send is manually triggered in back-end.
 
 = 1.0.0 =
 * First release
