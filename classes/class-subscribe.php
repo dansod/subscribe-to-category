@@ -607,9 +607,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
      *
      * @since  1.0.0 
   	 * 
-     * @return [type] [description]
-     *
-     * @todo add some filter 
+     * @return string
   	 */
   	public function stc_subscribe_render( $atts ){
 
@@ -618,7 +616,7 @@ if( class_exists( 'STC_Subscribe' ) ) {
   		$this->html_render( $atts );
   		$form = ob_get_contents();
   		ob_get_clean();
-  		//$form = apply_filters( 'stc_form', $form, 'teststring' );
+
   		return $form;
   	}
 
@@ -833,7 +831,16 @@ if( class_exists( 'STC_Subscribe' ) ) {
   		if(!empty( $this->error)){
   			if( isset( $_POST['stc_email']) )
   				$email = $_POST['stc_email'];
-  		}
+  		}else{
+        // preset for email adress if the user is logged in
+        if( is_user_logged_in() ){
+          $user_id = get_current_user_id();
+          $user_info = get_userdata( $user_id );
+          $email = $user_info->user_email;
+        }
+      }
+
+
 
       // Is there a unsubscribe action
       $post_stc_unsubscribe = false;
